@@ -1,0 +1,66 @@
+{
+    # RPAN Subreddit List
+    "rpan_subreddits": {
+        "list": [
+            "pan",
+            "animalsonreddit",
+            "distantsocializing",
+            "glamourschool",
+            "headlineworthy",
+            "readwithme",
+            "redditinthekitchen",
+            "redditmasterclasses",
+            "redditsessions",
+            "shortcircuit",
+            "talentshow",
+            "theartiststudio",
+            "thegamerlounge",
+            "theyoushow",
+            "whereintheworld"
+        ],
+        "abbreviations": {
+            "aor": "animalsonreddit",
+            "ds": "distantsocializing",
+            "gs": "glamourschool",
+            "hw": "headlineworthy",
+            "rwm": "readwithme",
+            "ritk": "redditinthekitchen",
+            "rmc": "redditmasterclasses",
+            "rs": "redditsessions",
+            "sc": "shortcircuit",
+            "ts": "talentshow",
+            "tas": "theartiststudio",
+            "tgl": "thegamerlounge",
+            "tys": "theyoushow",
+            "witw": "whereintheworld"
+        }
+    },
+
+    # Modqueue/Modmail Notifications (this dictionary can be empty)
+    # Subreddit Name to Channel ID
+    "mqmm_notifications": {
+        "subreddit1": 000000000000000000,
+        "subreddit2": 000000000000000000,
+        "subreddit3": 000000000000000000
+    },
+
+    # Bot Support Guilds
+    # These are the guilds where the bug report commands are enabled.
+    "bot_support_guilds": [
+        725895559973699645 # RPANBot Support Guild
+    ],
+
+    # RPAN Subreddit Guilds
+    # These are the guilds where the report command is enabled.
+    "rpan_guilds": [
+        725895559973699645 # RPANBot Support Guild
+    ],
+
+	# Main Bot Developers
+    # These users are given access to developer commands.
+    "bot_developer_ids": [
+        564751291100823552, # OneUpPotato
+        554807126174990349, # JayRy27
+        466677474672246795 # bsoyka
+    ]
+}
