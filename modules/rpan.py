@@ -9,7 +9,7 @@ from discord.ext import commands
 from .utils.reddit import get_reddit
 from .utils.settings import get_rpan_sub_abbreviations
 from .utils.classes import Broadcast, Broadcasts, PushshiftBroadcasts
-from .utils.helpers import generate_embed, is_rpan_guild
+from .utils.helpers import generate_embed, is_rpan_guild, format_timestamp
 
 class RPAN(commands.Cog):
     def __init__(self, bot):
