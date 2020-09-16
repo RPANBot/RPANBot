@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, String, create_engine, literal
+from sqlalchemy import Integer, BigInteger, Column, String, create_engine, literal
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -14,17 +14,21 @@ class GuildPrefix(Base):
     def __repr__(self):
         return f"Prefix({self.guild_prefix})"
 
-class StreamNotifications(Base):
-    __tablename__ = 'streamNotificationsSettings'
+class BNSetting(Base):
+    __tablename__ = 'broadcast_notifications'
 
-    guild_id = Column(BigInteger, primary_key=True)
-    notifications_usernames = Column(String)
-    notifications_channel_id = Column(BigInteger)
-    notifications_custom_text = Column(String)
-    notifications_keywords = Column(String)
+    id = Column(Integer, primary_key=True)
+
+    guild_id = Column(BigInteger)
+    channel_id = Column(BigInteger)
+    webhook_url = Column(String)
+
+    usernames = Column(String)
+    custom_text = Column(String)
+    keywords = Column(String)
 
     def __repr__(self):
-        return f"StreamNotifications({self.guild_id})"
+        return f"BNSetting({self.guild_id}, {self.channel_id})"
 
 # Create Databases
 Base.metadata.create_all(engine)

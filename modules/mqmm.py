@@ -7,9 +7,9 @@ import discord
 from discord import Color
 from praw.models import Submission
 
-from .utils.reddit import get_reddit
-from .utils.helpers import generate_embed
-from .utils.settings import get_mqmm_settings
+from utils.reddit import get_reddit
+from utils.helpers import generate_embed
+from utils.settings import get_mqmm_settings
 
 class MQMMNotifications:
     def __init__(self, bot):

@@ -5,8 +5,8 @@ import asyncio
 from re import search
 from base36 import dumps, loads
 
-from .utils.helpers import generate_embed, is_main_dev, is_rpan_bot_guild
-from .utils.settings import get_approved_bugs_channel, get_bug_reports_channel, get_denied_bugs_channel
+from utils.helpers import generate_embed, is_main_dev, is_rpan_bot_guild
+from utils.settings import get_approved_bugs_channel, get_bug_reports_channel, get_denied_bugs_channel
 
 def author_channel_check(author, channel):
     def inner_check(message):

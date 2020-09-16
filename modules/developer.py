@@ -8,11 +8,10 @@ from sys import executable
 from os import getcwd, system
 from typing import Optional, Union
 
-from .utils.database import GuildPrefix, StreamNotifications, get_db_session
-from .utils.helpers import generate_embed, is_main_dev
-from .utils.reddit import get_reddit
-from .utils.settings import get_discord_key
-
+from utils.database import GuildPrefix, get_db_session
+from utils.helpers import generate_embed, is_main_dev
+from utils.reddit import get_reddit
+from utils.settings import get_discord_key
 
 class Developer(commands.Cog):
     def __init__(self, bot):
@@ -35,116 +34,6 @@ class Developer(commands.Cog):
                     message=ctx.message
                 ),
             )
-    @developer.group(pass_context=True, name="streamnotifs_set", help="Set a stream notifications attribute of a guild.")
-    async def developer_streamnotifs_set(self, ctx, guild_id, attribute, *, value):
-        valid_attributes = [
-            "channel",
-            "text",
-            "add",
-            "remove",
-        ]
-        attribute = attribute.lower()
-        if attribute in valid_attributes:
-            result = get_db_session().query(StreamNotifications).filter_by(guild_id=guild_id).first()
-            updated = StreamNotifications(
-                guild_id=guild_id,
-            )
-
-            if result == None:
-                updated.notifications_channel_id = 000000000000000000
-
-            attribute_to_alias = {
-                "channel": "notifications_channel_id",
-                "text": "notifications_custom_text",
-            }
-            if attribute not in ["add", "remove"]:
-                exec(f"updated.{attribute_to_alias[attribute]} = {value}")
-            else:
-                current_users = result.notifications_usernames
-                if current_users in [None, ""]:
-                    current_users = "[]"
-
-                current_users = loads(current_users)
-                value = value.lower()
-                if value not in current_users:
-                    if attribute == "add":
-                        current_users.append(value)
-
-                if attribute == "remove":
-                    current_users.remove(value)
-
-            await ctx.send("", embed=generate_embed(
-                title="Stream Notifications (Debug Tools)",
-                description="Succesfully updated attribute(s).",
-                fields={
-                    "Attribute": attribute,
-                    "Value": value,
-                },
-                footer_text=f"Requested by {ctx.author}",
-            ))
-        else:
-            await ctx.send("", embed=generate_embed(
-                title="Stream Notifications (Debug Tools)",
-                description="That is an invalid attribute.",
-                color=discord.Color(0x8B0000),
-                footer_text=f"Requested by {ctx.author}",
-            ))
-
-    @developer.group(pass_context=True, name="streamnotifs_get", help="View the stream notification settings of a guild (by guild ID). (USED FOR DEBUGGING)")
-    async def developer_streamnotifs(self, ctx, guildId: int=0):
-        if guildId == 0:
-            guildId = ctx.guild.id
-
-        try:
-            result = get_db_session().query(StreamNotifications).filter_by(guild_id=guildId).first()
-            if result != None:
-                usernames = loads(result.notifications_usernames)
-
-                phrases = []
-                try:
-                    phrases = loads(result.notifications_keywords)
-                except:
-                    pass
-
-                await ctx.send(
-                    "",
-                    embed=generate_embed(
-                        title="Stream Notifications (Developer)",
-                        fields={
-                            "Notifications for": (", ".join(["``u/{}``".format(username) for username in usernames]) if len(usernames) >= 1 else "None"),
-                            "Notifications Channel": ("<#{channelId}> ({channelId})".format(channelId=result.notifications_channel_id) if result.notifications_channel_id not in [None, ""] else "None"),
-                            "Custom Notifications Text": (result.notifications_custom_text if result.notifications_custom_text not in [None, ""] else "None"),
-                            "(Title) Keyword Requirements": (" or ".join(["``{}``".format(phrase) for phrase in phrases]) if len(phrases) >= 1 else "None"),
-                        },
-                        footer_text=f"Requested by {ctx.author} - Guild: {guildId}",
-                        bot=self.bot,
-                        message=ctx.message
-                    ),
-                )
-            else:
-                await ctx.send(
-                    "",
-                    embed=generate_embed(
-                        title="Stream Notifications (Developer)",
-                        description="There are no stream notification settings for that guild.",
-                        footer_text=f"Requested by {ctx.author}",
-                        bot=self.bot,
-                        message=ctx.message
-                    ),
-                )
-        except:
-            await ctx.send(
-                "",
-                embed=generate_embed(
-                    title="Stream Notifications (Developer)",
-                    description="There was a problem getting the settings for that server.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
-                    bot=self.bot,
-                    message=ctx.message
-                ),
-            )
-            raise
 
     @developer.group(pass_context=True, name="getprefix", help="Get the bot prefix of a Discord guild.")
     async def developer_getprefix(self, ctx, guild_id: int=0):

@@ -4,7 +4,7 @@ from discord.ext.commands import Cog
 from time import time
 from requests import post
 
-from .utils.settings import get_statuspage_key
+from utils.settings import get_statuspage_key
 
 class StatusModule(Cog):
     def __init__(self, bot):

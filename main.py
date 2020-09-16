@@ -3,20 +3,25 @@ from discord.ext import commands
 
 from os import path
 from glob import glob
+from traceback import print_exc
 from pygount import ProjectSummary, SourceAnalysis
 
 from traceback import print_exc
 from logging import WARNING, FileHandler, Formatter, getLogger
 
-from modules.utils.helpers import generate_embed
-from modules.utils.sentry import init_sentry, get_sentry
-from modules.utils.database import GuildPrefix, get_db_session
-from modules.utils.settings import load_configs, get_discord_key, get_default_prefix, get_sentry_link, get_error_channel, get_join_leave_channel
+from utils.sentry import init_sentry, get_sentry
+from utils.database import GuildPrefix, get_db_session
+from utils.settings import load_configs, get_discord_key, get_default_prefix, get_sentry_link
 
 class RPANBot(commands.Bot):
     def __init__(self):
         # Load the configuration files.
         load_configs(path.dirname(path.abspath(__file__)))
+
+        # Set the links to the support guild and inviting the bot.
+        self.support_guild_link = "https://discord.gg/DfBp4x4"
+        self.bot_avatar_link = "https://i.imgur.com/Ayj5squ.png"
+        self.bot_invite_link = "https://discord.com/oauth2/authorize?client_id=710945234892095559&scope=bot&permissions=537095232"
 
         # Initiate the bot instance.
         super().__init__(
@@ -43,6 +48,9 @@ class RPANBot(commands.Bot):
         # Initiate sentry.
         init_sentry(get_sentry_link())
         self.sentry = get_sentry()
+
+        # Set the database session.
+        self.db_session = get_db_session()
 
         # Calculate the lines of code.
         self.calculate_lines_of_code()
@@ -71,7 +79,7 @@ class RPANBot(commands.Bot):
             return get_default_prefix()
 
         try:
-            result = get_db_session().query(GuildPrefix).filter(GuildPrefix.guild_id==message.guild.id).first()
+            result = self.db_session.query(GuildPrefix).filter(GuildPrefix.guild_id==message.guild.id).first()
             prefix = get_default_prefix() if result == None else result.guild_prefix
             return commands.when_mentioned_or(prefix)(self, message)
         except:
@@ -84,25 +92,22 @@ class RPANBot(commands.Bot):
         else:
             return prefix[2]
 
-    def set_server_prefix(self, server, prefix):
-        guild_id = 0
-        if isinstance(server, int):
-            guild_id = server
-        else:
-            guild_id = server.id
+    def set_server_prefix(self, server, prefix=None):
+        guild_id = server if isinstance(server, int) else server.id
+        if prefix == None:
+            prefix = get_default_prefix()
 
         if prefix != get_default_prefix():
-            prefixSetting = GuildPrefix(
+            prefix_setting = GuildPrefix(
                 guild_id=guild_id,
                 guild_prefix=prefix,
             )
 
-            get_db_session().merge(prefixSetting)
-            get_db_session().commit()
+            self.db_session.merge(prefix_setting)
         else:
             # Prefix is set to the default, so we don't need a record anymore.
-            get_db_session().query(GuildPrefix).filter_by(guild_id=guild_id).delete()
-            get_db_session().commit()
+            self.db_session.query(GuildPrefix).filter_by(guild_id=guild_id).delete()
+        self.db_session.commit()
 
     def calculate_lines_of_code(self):
         project_summary = ProjectSummary()
@@ -116,103 +121,6 @@ class RPANBot(commands.Bot):
 
     async def before_command(self, ctx):
         await ctx.trigger_typing()
-
-    async def on_guild_join(self, guild):
-        join_channel = await self.fetch_channel(get_join_leave_channel())
-        await join_channel.send(
-            "",
-            embed=generate_embed(
-                title="Joined {}".format(guild.name),
-                color=discord.Color(0x32CD32),
-                fields={
-                    "Owner": f"{guild.owner}\n({guild.owner_id})",
-                    "Guild ID": "{}".format(guild.id),
-                    "Member Count": "{}".format(guild.member_count),
-                },
-                thumbnail=guild.icon_url,
-                footer_text="None",
-            ),
-        )
-
-    async def on_guild_remove(self, guild):
-        leave_channel = await self.fetch_channel(get_join_leave_channel())
-        await leave_channel.send(
-            "",
-            embed=generate_embed(
-                title=f"Left {guild.name}",
-                color=discord.Color(0x8B0000),
-                fields={
-                    "Owner": f"{guild.owner}\n({guild.owner_id})",
-                    "Guild ID": f"{guild.id}",
-                    "Member Count": f"{guild.member_count}",
-                },
-                thumbnail=guild.icon_url,
-                footer_text="None",
-            ),
-        )
-
-    async def on_command_error(self, ctx, error):
-        # Ignore if the exception is command not found.
-        if isinstance(error, commands.CommandNotFound):
-            return
-
-        # Log the exception.
-        print(error)
-        self.sentry.capture_exception(error)
-
-        # Return if there is already an error handler for this command.
-        if hasattr(ctx.command, "on_error"):
-            return
-
-        error_log_channel = await self.fetch_channel(get_error_channel())
-        if isinstance(error, commands.CheckFailure):
-            await ctx.send(
-                "",
-                embed=generate_embed(
-                    title="Insufficient Permissions", color=discord.Color(0x8B0000),
-                ),
-            )
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(
-                "",
-                embed=generate_embed(
-                    title="Error - Missing Argument",
-                    description=f"Missing the following required argument: '{error.param.name}'.",
-                    color=discord.Color(0x8B0000),
-                    footer_text="Caused by {}".format(str(ctx.author)),
-                    bot=self,
-                    message=ctx.message,
-                ),
-            )
-        else:
-            await error_log_channel.send(
-                "",
-                embed=generate_embed(
-                    title="Command Error Report",
-                    fields={
-                        "Error Type": type(error.original).__name__,
-                        "Arguments": "\n".join(error.original.args),
-                        "Invoking User": f"{ctx.author} ({ctx.author.id})",
-                        "Invoking Message": ctx.message.content,
-                        "Guild": f"{ctx.guild.name} ({ctx.guild.id})",
-                    },
-                    color=discord.Color(0x8B0000),
-                    footer_text="None",
-                ),
-            )
-
-            await ctx.send(
-                "",
-                embed=generate_embed(
-                    title="An Error Occurred",
-                    description="An error has occurred, but don't worry!\nA report has been sent to the developers.",
-                    fields={
-                        "Support Server": f"{self.get_relevant_prefix(ctx.message)}support",
-                        "Send Feedback": f"{self.get_relevant_prefix(ctx.message)}feedback <message>",
-                    },
-                    color=discord.Color(0x8B0000),
-                ),
-            )
 
 # Initiate the bot.
 RPANBot()

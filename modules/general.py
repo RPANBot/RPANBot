@@ -1,14 +1,17 @@
 # General Module
 from discord.ext import commands
+
+from textwrap import dedent
+
 from psutil import cpu_percent, virtual_memory
 
-from .utils.helpers import generate_embed
+from utils.helpers import generate_embed
 
 class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["ping", "latency", "cpu", "memory"])
+    @commands.command(aliases=["cpu", "memory"])
     async def info(self, ctx):
         """
         Get some information about the bot.
@@ -17,7 +20,7 @@ class General(commands.Cog):
             "",
             embed=generate_embed(
                 title="Information",
-                description=f"You can see a list of commands by using '{self.bot.get_relevant_prefix(ctx.message)}help'.",
+                description="You can see a list of commands by using '{prefix}help'.".format(prefix=self.bot.get_relevant_prefix(ctx.message)),
                 fields={
                     "Core Developers": "OneUpPotato#1418\nJayRy27#0001\nbsoyka#0001",
                     "Joined Servers": len(self.bot.guilds),
@@ -26,7 +29,23 @@ class General(commands.Cog):
                     "CPU/Memory Usage": f"{cpu_percent()}%/{virtual_memory().percent}%",
                     "Lines of Code": f"{self.bot.lines_of_code}",
                 },
-                thumbnail="https://i.imgur.com/Ayj5squ.png",
+                thumbnail=self.bot.bot_avatar_link,
+                footer_text=f"Requested by {ctx.author}",
+                bot=self.bot,
+                message=ctx.message
+            ),
+        )
+
+    @commands.command(aliases=["latency"])
+    async def ping(self, ctx):
+        """
+        View the current latency of the bot.
+        """
+        await ctx.send(
+            "",
+            embed=generate_embed(
+                title="Pong!",
+                description=f"{round(self.bot.latency * 1000)}ms",
                 footer_text=f"Requested by {ctx.author}",
                 bot=self.bot,
                 message=ctx.message
@@ -72,8 +91,8 @@ class General(commands.Cog):
             "",
             embed=generate_embed(
                 title="Click here to invite the bot to your server.",
-                description="You can also join the [bot support server](https://discord.gg/DfBp4x4)!",
-                url="https://discord.com/api/oauth2/authorize?client_id=710945234892095559&permissions=224256&scope=bot",
+                description=f"You can also join the [bot support server!]({self.bot.support_guild_link})",
+                url=f"{self.bot.bot_invite_link}",
                 footer_text=f"Requested by {ctx.author}",
                 bot=self.bot,
                 message=ctx.message
@@ -89,8 +108,8 @@ class General(commands.Cog):
             "",
             embed=generate_embed(
                 title="Click here to join the bot support server.",
-                url="https://discord.gg/DfBp4x4",
-                footer_text="Requested by {}".format(str(ctx.author)),
+                url=self.bot.support_guild_link,
+                footer_text=f"Requested by {ctx.author}",
                 bot=self.bot,
                 message=ctx.message
             ),
@@ -105,11 +124,13 @@ class General(commands.Cog):
             "",
             embed=generate_embed(
                 title="Privacy Policy",
-                description="""
-RPANBot only stores information when it is needed to provide one of its features. The bot only stores stream notification settings and custom guild prefixes, which are both provided to it by you setting up those particular features.
+                description=dedent("""
+                    RPANBot only stores information when it is needed to provide one of its features. The bot only stores stream notification settings and custom guild prefixes, which are both provided to it by you setting up those particular features.
 
-You can contact the developers using the bot's feedback command requesting that any settings for your guild be deleted, or you can delete your stream notifications settings using a command and set the custom prefix back to the bot's default prefix.
-                """.strip(),
+                    You can contact the developers using the bot's feedback command requesting that any settings for your guild be deleted, or you can delete your stream notifications settings using a command and set the custom prefix back to the bot's default prefix.
+
+                    When the bot leaves/is removed from a guild, it'll attempt to delete any settings it has stored for it.
+                """).strip(),
                 footer_text=f"Requested by {ctx.author}",
                 bot=self.bot,
                 message=ctx.message
