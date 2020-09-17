@@ -4,9 +4,9 @@ from discord.ext import commands
 
 from git import cmd
 from json import loads
-from sys import executable
-from os import getcwd, system
+from sys import executable, argv
 from typing import Optional, Union
+from os import getcwd, system, execl
 
 from utils.database import GuildPrefix, get_db_session
 from utils.helpers import generate_embed, is_main_dev
@@ -244,7 +244,8 @@ class Developer(commands.Cog):
         except:
             pass
         finally:
-            system(f"{executable} -m pip install --upgrade -r requirements.txt && {executable} main.py")
+            system(f"{executable} -m pip install --upgrade -r requirements.txt")
+            execl(executable, executable, *argv)
 
     @developer.group(pass_context=True, name="restart-nopip", help="Restarts the bot without dependency upgrades from pip.")
     async def developer_restart_nopip(self, ctx):
@@ -254,7 +255,7 @@ class Developer(commands.Cog):
         except:
             pass
         finally:
-            system(f"{executable} main.py")
+            execl(executable, executable, *argv)
 
     @developer.group(pass_context=True, name="eval", help="Evaluates an expression")
     async def developer_eval(self, ctx, *, expression):
