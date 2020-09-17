@@ -282,6 +282,9 @@ class Management(commands.Cog, name="Server Management"):
         self.bot.db_session.add(notif_setting)
         self.bot.db_session.commit()
 
+        # Set the current guild selection to the new setting.
+        self.notifs_handler.selections[ctx.guild.id] = channel
+
         # Send a message to the user.
         fields = {}
         if username:
@@ -292,7 +295,7 @@ class Management(commands.Cog, name="Server Management"):
             "",
             embed=generate_embed(
                 title="Stream Notifications",
-                description="Succesfully setup stream notifications for that channel.",
+                description="Succesfully setup stream notifications for that channel.\nAlso, that channel is now the current selection.",
                 fields=fields,
                 footer_text=f"Requested by {ctx.author}",
                 bot=self.bot,

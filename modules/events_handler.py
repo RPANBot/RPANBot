@@ -87,6 +87,7 @@ class EventsHandler(commands.Cog):
             "",
             embed=generate_embed(
                 title=f"Joined {guild.name}",
+                description=f"Now in {len(self.bot.guilds)} guilds.",
                 color=discord.Color(0x32CD32),
                 fields={
                     "Owner": f"{guild.owner}\n({guild.owner_id})",
@@ -114,6 +115,7 @@ class EventsHandler(commands.Cog):
             "",
             embed=generate_embed(
                 title=f"Left {guild.name}",
+                description=f"Now in {len(self.bot.guilds)} guilds.",
                 color=discord.Color(0x8B0000),
                 fields={
                     "Owner": f"{guild.owner}\n({guild.owner_id})",
