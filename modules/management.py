@@ -47,7 +47,7 @@ class Management(commands.Cog, name="Server Management"):
         """
         Set the bot prefix for the server
         """
-        if prefix > 25:
+        if len(prefix) > 25:
             await ctx.send(
                 "",
                 embed=generate_embed(
