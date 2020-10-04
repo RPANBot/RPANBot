@@ -410,5 +410,29 @@ class Developer(commands.Cog):
                 ),
             )
 
+    @developer.group(name="leave", help="Leave a guild of a specified id.")
+    async def developer_leave(self, ctx, id: int):
+        guild = self.bot.get_guild(id)
+
+        try:
+            await guild.leave()
+        except:
+            pass
+        finally:
+            await ctx.send(
+                "",
+                embed=RPANEmbed(
+                    title="Guild Leave",
+                    fields={
+                        "Name": guild.id,
+                        "Owner": str(guild.owner),
+                        "ID": id,
+                    },
+                    user=ctx.author,
+                    bot=self.bot,
+                    message=ctx.message,
+                ),
+            )
+
 def setup(bot):
     bot.add_cog(Developer(bot))
