@@ -1,15 +1,13 @@
 # Reddit Public Access Network Module
-from datetime import datetime, timezone
-from re import sub
-from textwrap import dedent
-
-import discord
 from discord.ext import commands
 
-from utils.reddit import get_reddit
-from utils.settings import get_rpan_sub_abbreviations
-from utils.classes import Broadcast, Broadcasts, PushshiftBroadcasts
-from utils.helpers import generate_embed, is_rpan_guild, format_timestamp
+from re import sub
+from textwrap import dedent
+from datetime import datetime, timezone
+
+from utils.checks import is_rpan_guild
+from utils.helpers import format_timestamp
+from utils.classes import RPANEmbed, Broadcast, Broadcasts, PushshiftBroadcasts
 
 class RPAN(commands.Cog):
     def __init__(self, bot):
@@ -22,10 +20,10 @@ class RPAN(commands.Cog):
         """
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Click here to view the RPAN wiki.",
                 url="https://www.reddit.com/r/pan/wiki/index",
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
                 message=ctx.message
             ),
@@ -36,7 +34,7 @@ class RPAN(commands.Cog):
         """
         Find the current top RPAN stream (optionally: on a specific subreddit)
         """
-        sub_abbreviations = get_rpan_sub_abbreviations()
+        sub_abbreviations = self.bot.settings.reddit.rpan_sub_abbreviations
         if subreddit.lower() in sub_abbreviations.keys():
             subreddit = sub_abbreviations[subreddit.lower()]
 
@@ -49,7 +47,7 @@ class RPAN(commands.Cog):
             if top_broadcast != None:
                 await ctx.send(
                     "",
-                    embed=generate_embed(
+                    embed=RPANEmbed(
                         title="Current Top Stream{}".format("" if subreddit == None else f" (on r/{subreddit.lower()})"),
                         url=top_broadcast.url,
                         fields={
@@ -61,7 +59,7 @@ class RPAN(commands.Cog):
                             f"Unique Viewers": f"{top_broadcast.unique_watchers}",
                         },
                         thumbnail=top_broadcast.thumbnail,
-                        footer_text=f"Requested by {ctx.author}",
+                        user=ctx.author,
                         bot=self.bot,
                         message=ctx.message
                     ),
@@ -69,11 +67,11 @@ class RPAN(commands.Cog):
             else:
                 await ctx.send(
                     "",
-                    embed=generate_embed(
+                    embed=RPANEmbed(
                         title="Top Stream",
                         description="Either there are no broadcasts on that subreddit right now, or that isn't an RPAN subreddit.",
-                        color=discord.Color(0xD2D219),
-                        footer_text=f"Requested by {ctx.author}",
+                        colour=0xD2D219,
+                        user=ctx.author,
                         bot=self.bot,
                         message=ctx.message
                     ),
@@ -115,28 +113,28 @@ class RPAN(commands.Cog):
 
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Statistics",
                     url=broadcast.url,
                     fields=fields,
                     thumbnail=broadcast.thumbnail,
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message
                 ),
             )
         elif broadcast.api_status == "video not found":
-                await ctx.send(
-                    "",
-                    embed=generate_embed(
-                        title="Stream Statistics",
-                        description="No broadcast was found. Is that an RPAN broadcast? Is the URL/ID correct?",
-                        color=discord.Color(0xD2D219),
-                        footer_text=f"Requested by {ctx.author}",
-                        bot=self.bot,
-                        message=ctx.message
-                    ),
-                )
+            await ctx.send(
+                "",
+                embed=RPANEmbed(
+                    title="Stream Statistics",
+                    description="No broadcast was found. Is that an RPAN broadcast? Is the URL/ID correct?",
+                    colour=0xD2D219,
+                    user=ctx.author,
+                    bot=self.bot,
+                    message=ctx.message
+                ),
+            )
         else:
             await ctx.send(f"{ctx.author.mention} - There is a problem with getting RPAN broadcasts right now.")
 
@@ -153,7 +151,7 @@ class RPAN(commands.Cog):
             if found_broadcast != False:
                 await ctx.send(
                     "",
-                    embed=generate_embed(
+                    embed=RPANEmbed(
                         title=f"u/{found_broadcast.author_name}'s Current Stream (Live)",
                         url=found_broadcast.url,
                         fields={
@@ -165,9 +163,9 @@ class RPAN(commands.Cog):
                             "Unique Viewers": f"{found_broadcast.unique_watchers}",
                         },
                         thumbnail=found_broadcast.thumbnail,
-                        footer_text=f"Requested by {ctx.author}",
+                        user=ctx.author,
                         bot=self.bot,
-                        message=ctx.message
+                        message=ctx.message,
                     ),
                 )
             else:
@@ -175,7 +173,7 @@ class RPAN(commands.Cog):
                 if last_broadcast != None:
                     await ctx.send(
                         "",
-                        embed=generate_embed(
+                        embed=RPANEmbed(
                             title=f"u/{last_broadcast.author_name}'s Last Stream (Off-Air)",
                             url=last_broadcast.url,
                             fields={
@@ -187,21 +185,21 @@ class RPAN(commands.Cog):
                                 "Unique Viewers": f"{last_broadcast.unique_watchers}",
                             },
                             thumbnail=last_broadcast.thumbnail,
-                            footer_text=f"Requested by {ctx.author}",
+                            user=ctx.author,
                             bot=self.bot,
-                            message=ctx.message
+                            message=ctx.message,
                         ),
                     )
                 else:
                     await ctx.send(
                         "",
-                        embed=generate_embed(
+                        embed=RPANEmbed(
                             title="View Stream",
                             description="Unable to find that user's last broadcast.",
-                            color=discord.Color(0xD2D219),
-                            footer_text=f"Requested by {ctx.author}",
+                            colour=0xD2D219,
+                            user=ctx.author,
                             bot=self.bot,
-                            message=ctx.message
+                            message=ctx.message,
                         ),
                     )
         else:
@@ -260,13 +258,13 @@ class RPAN(commands.Cog):
             if type in aliases.keys():
                 type = aliases[type]
 
-        embed = generate_embed(
+        embed = RPANEmbed(
             title="Click here to go to the report page.",
             description="Did you find a user that is violating the Reddit Content Policy but don’t know how to report them? Just head on over to reddit.com/report (or click above) and you can report the user there.",
             url="https://reddit.com/report",
-            footer_text=f"Requested by {ctx.author}",
+            user=ctx.author,
             bot=self.bot,
-            message=ctx.message
+            message=ctx.message,
         )
 
         if type != None and type in accepted_types.keys():
@@ -294,8 +292,8 @@ class RPAN(commands.Cog):
         ]
         if time_period.lower() in allowed_time_periods:
             top_broadcast = {}
-            for subreddit in get_rpan_sub_abbreviations().values():
-                for submission in get_reddit().subreddit(subreddit).search("flair_name:\"Broadcast\"", sort="top", time_filter=time_period, limit=1):
+            for subreddit in self.bot.settings.reddit.rpan_subreddits:
+                for submission in self.bot.reddit.subreddit(subreddit).search("flair_name:\"Broadcast\"", sort="top", time_filter=time_period, limit=1):
                     top_broadcast[subreddit] = submission
 
             fields = {}
@@ -306,17 +304,23 @@ class RPAN(commands.Cog):
             if fields == {}:
                 fields["Problem"] = "The bot was unable to find any top broadcasts within that given time period."
 
-            await ctx.send("", embed=generate_embed(
-                title="Top Streams",
-                description=f"These are the top broadcasts within the past {time_period}.",
-                fields=fields,
-            ))
+            await ctx.send(
+                "",
+                embed=RPANEmbed(
+                    title="Top Streams",
+                    description=f"These are the top broadcasts within the past {time_period}.",
+                    fields=fields,
+                ),
+            )
 
         else:
-            await ctx.send("", embed=generate_embed(
-                title="Error - Top Streams",
-                description="You input an invalid amount of time.",
-            ))
+            await ctx.send(
+                "",
+                embed=RPANEmbed(
+                    title="Error - Top Streams",
+                    description="You input an invalid amount of time.",
+                )
+            )
 
 def setup(bot):
     bot.add_cog(RPAN(bot))

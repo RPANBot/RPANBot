@@ -4,13 +4,11 @@ from discord.ext.commands import Cog
 from time import time
 from requests import post
 
-from utils.settings import get_statuspage_key
-
 class StatusModule(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        if get_statuspage_key():
+        if self.bot.settings.statuspage_key:
             self.sender.start()
 
     def cog_unload(self):
@@ -23,7 +21,7 @@ class StatusModule(Cog):
             params={"data[timestamp]": int(time()), "data[value]": self.bot.latency * 1000},
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Authorization": "OAuth " + get_statuspage_key(),
+                "Authorization": "OAuth " + self.bot.settings.statuspage_key,
             },
         )
 

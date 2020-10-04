@@ -2,29 +2,17 @@
 import discord
 from discord.ext import commands
 
-from asyncio import sleep, TimeoutError
-from aiohttp import ClientSession
 from textwrap import dedent
+from aiohttp import ClientSession
+from asyncio import sleep, TimeoutError
 
 from typing import Optional, Union
 
-from utils.errors import GuildNotifsLimitExceeded
-from utils.helpers import generate_embed
+from utils.checks import is_main_dev
 from utils.database import BNSetting
-from utils.classes import BroadcastNotifSettingsHandler, BNUsernamesAttr, BNKeywordsAttr
-
-def parse_id(string: str) -> Union[int, None]:
-    """
-    Parses a string to turn a mention (if there's one) into an id.
-    :return: The filtered id.
-    """
-    try:
-        return int("".join([char for char in string if char.isdigit()]))
-    except ValueError:
-        return None
-
-def parse_username(username: str) -> str:
-    return username.replace("/u/", "").replace("u/", "").lower()
+from utils.errors import GuildNotifsLimitExceeded
+from utils.helpers import parse_username, parse_id
+from utils.classes import RPANEmbed, BroadcastNotifSettingsHandler, BNUsernamesAttr, BNKeywordsAttr
 
 def parse_keyword(keyword: str) -> str:
     return keyword.lower()
@@ -33,10 +21,10 @@ class Management(commands.Cog, name="Server Management"):
     def __init__(self, bot):
         self.bot = bot
 
-        self.invalid_selection_embed = generate_embed(
+        self.invalid_selection_embed = RPANEmbed(
             title="Stream Notifications - Error",
             description="**No valid selection was found.**\nThere was either:\n* No notification settings setup.\n* An invalid notification setting selection.",
-            color=discord.Color(0x8B0000),
+            colour=0x8B0000,
         )
 
         self.notifs_handler = BroadcastNotifSettingsHandler()
@@ -50,11 +38,11 @@ class Management(commands.Cog, name="Server Management"):
         if len(prefix) > 25:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="The custom prefix cannot be longer than 25 characters.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -66,14 +54,15 @@ class Management(commands.Cog, name="Server Management"):
 
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Prefix Changed",
                 fields={
                     "Old Prefix": old_prefix,
                     "New Prefix": prefix,
                 },
-                footer_text=f"Requested by {ctx.author}",
-                bot=self.bot, message=ctx.message,
+                user=ctx.author,
+                bot=self.bot,
+                message=ctx.message,
             )
         )
 
@@ -88,7 +77,7 @@ class Management(commands.Cog, name="Server Management"):
             relevant_prefix = self.bot.get_relevant_prefix(ctx.message)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications",
                     description=dedent("""
                         Configure notifications for when certain users go live on RPAN.
@@ -133,7 +122,7 @@ class Management(commands.Cog, name="Server Management"):
                             ``{prefix}sn remove (ID *Optional*)`` - Delete the notification settings for a specified/the currently selected channel.
                         """).format(prefix=relevant_prefix),
                     },
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -149,10 +138,10 @@ class Management(commands.Cog, name="Server Management"):
             self.notifs_handler.selections[ctx.guild.id] = notif_setting.channel_id
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Settings",
                     description=f"Selected the <#{notif_setting.channel_id}> channel.\nThis means that any stream notif settings you change will affect this channel's settings.\n**Important:** Please note that this selection is guild wide, so if someone else changes it, then it'll change for you as well.",
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -160,11 +149,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="That is not a valid selection.\nPlease use the channel id or the id show in your notif settings list.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -192,7 +181,7 @@ class Management(commands.Cog, name="Server Management"):
         selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title=f"Stream Notifications - Current Selection #{selection_local_id + 1}",
                 fields={
                     "Notifications for": notifications_for,
@@ -200,7 +189,7 @@ class Management(commands.Cog, name="Server Management"):
                     "Custom Notifications Text": notif_setting.custom_text if notif_setting.custom_text != None else "None",
                     "Keyword Requirements": f"View using: ``{prefix}sn keywords``",
                 },
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
                 message=ctx.message,
             ),
@@ -214,11 +203,11 @@ class Management(commands.Cog, name="Server Management"):
         if notif_setting != None:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="There are already stream notifications setup for that channel.\nYou can select that channel and change settings for it.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -231,22 +220,41 @@ class Management(commands.Cog, name="Server Management"):
         if (notif_settings_count + 1) > notif_settings_limit:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description=f"You have reached the maximum amount ({notif_settings_limit}) of stream notification channels that the guild can have.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
             )
             return
 
+        # Validate the input username (if any).
+        if username:
+            if username.lower() == "rpanbot":
+                try:
+                    await is_main_dev(ctx)
+                except:
+                    await ctx.send(
+                        "",
+                        embed=RPANEmbed(
+                            title="Stream Notifications - Error",
+                            description="That is a prohibited stream notifications username.",
+                            colour=0x8B0000,
+                            user=ctx.author,
+                            bot=self.bot,
+                            message=ctx.message,
+                        ),
+                    )
+                    return
+
         # There are no notification settings for that channel.
         # Attempt to fetch the channel, and setup a webhook.
         webhook = None
         try:
-            fetched_channel = await self.bot.fetch_channel(channel)
+            fetched_channel = await self.bot.find_channel(channel)
             if fetched_channel.guild.id == ctx.guild.id:
                 webhook = await fetched_channel.create_webhook(name="RPANBot Stream Notifications", reason="Added stream notifs to a channel.")
             else:
@@ -261,11 +269,11 @@ class Management(commands.Cog, name="Server Management"):
         if webhook == None:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="That was an invalid channel/the bot was unable to setup a webhook there.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -293,11 +301,11 @@ class Management(commands.Cog, name="Server Management"):
 
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Stream Notifications",
                 description="Succesfully setup stream notifications for that channel.\nAlso, that channel is now the current selection.",
                 fields=fields,
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
                 message=ctx.message,
             ),
@@ -315,11 +323,11 @@ class Management(commands.Cog, name="Server Management"):
 
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - List",
                     description=f"This is a list of stream notification settings that can be selected from.",
                     fields=fields,
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -327,11 +335,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="There are currently no stream notification setup on this guild.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -367,11 +375,11 @@ class Management(commands.Cog, name="Server Management"):
             selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - Usernames for Setting #{selection_local_id + 1}",
                     description=f"Channel: <#{notif_setting.channel_id}>",
                     fields=fields,
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -389,27 +397,45 @@ class Management(commands.Cog, name="Server Management"):
         if username in ["", None] or len(username) > 22:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="You've not input a username/the username was too long (above 22 characters).",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 )
             )
             return
 
+        # Validate the input username.
+        if username.lower() == "rpanbot":
+            try:
+                await is_main_dev(ctx)
+            except:
+                await ctx.send(
+                    "",
+                    embed=RPANEmbed(
+                        title="Stream Notifications - Error",
+                        description="That is a prohibited stream notifications username.",
+                        colour=0x8B0000,
+                        user=ctx.author,
+                        bot=self.bot,
+                        message=ctx.message,
+                    ),
+                )
+                return
+
         usernames = BNUsernamesAttr(notif_setting.usernames)
         # Make sure that the channel hasn't hit the username maximum.
         if len(usernames.items) >= 1125:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="You are currently at the stream notifications maximum number of users (1125).",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 )
@@ -424,10 +450,10 @@ class Management(commands.Cog, name="Server Management"):
             selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - Added u/{username}",
                     description=f"**Succesfully added that user to your notifications for the following channel:**\nSetting #{selection_local_id + 1} - Channel: <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -435,11 +461,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - u/{username}",
                     description=f"**That user is already in your stream notifs for:** <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
-                    color=discord.Color(0x8B0000),
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -457,11 +483,11 @@ class Management(commands.Cog, name="Server Management"):
         if username in ["", None] or len(username) > 22:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="You've not input a username OR the username was too long to be in a notification setting (above 22 characters).",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 )
@@ -477,10 +503,10 @@ class Management(commands.Cog, name="Server Management"):
             selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - Removed u/{username}",
                     description=f"**Succesfully removed that user from your notifications for the following channel:**\nSetting #{selection_local_id + 1} - Channel: <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -488,11 +514,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - u/{username}",
                     description=f"**That user is not in your stream notifications for:** <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
-                    color=discord.Color(0x8B0000),
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -526,11 +552,11 @@ class Management(commands.Cog, name="Server Management"):
             selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - Keyword Filters for Setting #{selection_local_id + 1}",
                     description=f"Channel: <#{notif_setting.channel_id}>\n**A keyword is a word/phrase that is required in the title of a broadcast for a notification to be sent.**",
                     fields=fields,
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -548,11 +574,11 @@ class Management(commands.Cog, name="Server Management"):
         if len(keyword) > 1024:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="That keyword is too long (it has to be below 1024 characters).",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 )
@@ -564,11 +590,11 @@ class Management(commands.Cog, name="Server Management"):
         if len(keywords.items) >= 25:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="You are currently at the keywords maximum (25).",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 )
@@ -583,13 +609,13 @@ class Management(commands.Cog, name="Server Management"):
             selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Added Keyword",
                     description=f"Succesfully added that as one of the possible keyword requirements for the following channel:\nSetting #{selection_local_id + 1} - Channel: <#{notif_setting.channel_id}>",
                     fields={
                         "Added Keyword": keyword,
                     },
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -597,11 +623,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Keyword Failure",
                     description=f"That keyword is already added for: <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
-                    color=discord.Color(0x8B0000),
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -625,10 +651,10 @@ class Management(commands.Cog, name="Server Management"):
             selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title=f"Stream Notifications - Removed u/{username}",
                     description=f"Succesfully removed that user from your keywords list for the following channel:\nSetting #{selection_local_id + 1} - Channel: <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -636,11 +662,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Keyword Failure",
                     description=f"That keyword was not added on: <#{notif_setting.channel_id}>",
-                    footer_text=f"Requested by {ctx.author}",
-                    color=discord.Color(0x8B0000),
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -658,11 +684,11 @@ class Management(commands.Cog, name="Server Management"):
         if len(custom_text) > 1024:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Error",
                     description="That custom text is above the limit (1024 characters).",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 )
@@ -675,13 +701,13 @@ class Management(commands.Cog, name="Server Management"):
         selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Stream Notifications - Set Custom Text",
                 description=f"**Succesfully changed the custom text for the following channel:**\nSetting #{selection_local_id + 1} - Channel: <#{notif_setting.channel_id}>",
                 fields={
                     "New Text": custom_text,
                 },
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
                 message=ctx.message,
             ),
@@ -705,10 +731,10 @@ class Management(commands.Cog, name="Server Management"):
         selection_local_id = self.notifs_handler.parse_id_to_local(ctx.guild.id, current_selection)
         confirmation_message = await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Stream Notifications - Deletion Confirmation",
                 description=f"**Are you sure you want to delete the notifications for the following channel?:**\nSetting #{selection_local_id + 1} - Channel: <#{notif_setting.channel_id}>\n\nTo confirm, react with the following within the next 30 seconds: ✅",
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
                 message=ctx.message,
             ),
@@ -721,10 +747,10 @@ class Management(commands.Cog, name="Server Management"):
             await confirmation_message.add_reaction("✅")
             reaction, user = await self.bot.wait_for("reaction_add", timeout=30.0, check=confirmation_check)
         except TimeoutError:
-            await confirmation_message.edit(embed=generate_embed(
+            await confirmation_message.edit(embed=RPANEmbed(
                 title="Stream Notifications - Deletion",
                 description="No confirmation was given within 30 seconds.",
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
                 message=ctx.message,
             ))
@@ -742,20 +768,22 @@ class Management(commands.Cog, name="Server Management"):
                 self.bot.db_session.delete(notif_setting)
                 self.bot.db_session.commit()
 
-            await confirmation_message.edit(embed=generate_embed(
-                title="Stream Notifications - Succesful Deletion",
-                description=f"Succesfully deleted Setting #{selection_local_id + 1} on channel: <#{notif_setting.channel_id}>.",
-                footer_text=f"Requested by {ctx.author}",
-                bot=self.bot,
-                message=ctx.message,
-            ))
+            await confirmation_message.edit(
+                embed=RPANEmbed(
+                    title="Stream Notifications - Succesful Deletion",
+                    description=f"Succesfully deleted Setting #{selection_local_id + 1} on channel: <#{notif_setting.channel_id}>.",
+                    user=ctx.author,
+                    bot=self.bot,
+                    message=ctx.message,
+                )
+            )
 
     @streamnotifs.error
     async def streamnotifs_error(self, ctx, error):
         if isinstance(error, commands.errors.BotMissingPermissions):
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description=dedent("""
                         **The bot requires the following permission for stream notifications: 'Manage Webhooks'**
@@ -763,8 +791,8 @@ class Management(commands.Cog, name="Server Management"):
                         **If you'd like any assistance in setting up notifications, we're happy to help out.**
                         Just reach out to us in our support guild found by doing '{prefix}support'
                     """).strip().format(prefix=self.bot.get_relevant_prefix(ctx.message)),
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -772,11 +800,11 @@ class Management(commands.Cog, name="Server Management"):
         elif isinstance(error, commands.errors.CheckFailure):
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="You aren't authorised to use this.\nYou require the following permission: 'Manage Guild'",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -784,11 +812,11 @@ class Management(commands.Cog, name="Server Management"):
         elif isinstance(error, GuildNotifsLimitExceeded):
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="You are currently at the guild notification channel list.\nEither delete/modify an existing notification setting.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -796,11 +824,11 @@ class Management(commands.Cog, name="Server Management"):
         else:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Stream Notifications - Error",
                     description="Something else went wrong. The error has been reported.",
-                    color=discord.Color(0x8B0000),
-                    footer_text=f"Requested by {ctx.author}",
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),

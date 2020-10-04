@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from psutil import cpu_percent, virtual_memory
 
-from utils.helpers import generate_embed
+from utils.classes import RPANEmbed
 
 class General(commands.Cog):
     def __init__(self, bot):
@@ -18,7 +18,7 @@ class General(commands.Cog):
         """
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Information",
                 description="You can see a list of commands by using '{prefix}help'.".format(prefix=self.bot.get_relevant_prefix(ctx.message)),
                 fields={
@@ -29,10 +29,10 @@ class General(commands.Cog):
                     "CPU/Memory Usage": f"{cpu_percent()}%/{virtual_memory().percent}%",
                     "Lines of Code": f"{self.bot.lines_of_code}",
                 },
-                thumbnail=self.bot.bot_avatar_link,
-                footer_text=f"Requested by {ctx.author}",
+                thumbnail=self.bot.settings.links.bot_avatar,
+                user=ctx.author,
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
@@ -43,12 +43,12 @@ class General(commands.Cog):
         """
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Pong!",
                 description=f"{round(self.bot.latency * 1000)}ms",
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
@@ -69,16 +69,15 @@ class General(commands.Cog):
 
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Contributors",
                 description="This is a list of the people who have helped develop RPANBot.\nYou can also help contribute to the bot on [GitHub.](https://github.com/RPANBot/RPANBot)",
                 fields={
                     "Core Developers": "\n".join(core_developers),
                     "Other Contributors": "\n".join(other_contributors),
                 },
-                footer_text="None",
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
@@ -89,13 +88,13 @@ class General(commands.Cog):
         """
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Click here to invite the bot to your server.",
-                description=f"You can also join the [bot support server!]({self.bot.support_guild_link})",
-                url=f"{self.bot.bot_invite_link}",
-                footer_text=f"Requested by {ctx.author}",
+                description=f"You can also join the [bot support server!]({self.bot.settings.links.support_guild})",
+                url=self.bot.settings.links.bot_invite,
+                user=ctx.author,
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
@@ -106,12 +105,12 @@ class General(commands.Cog):
         """
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Click here to join the bot support server.",
-                url=self.bot.support_guild_link,
-                footer_text=f"Requested by {ctx.author}",
+                url=self.bot.settings.links.support_guild,
+                user=ctx.author,
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
@@ -122,7 +121,7 @@ class General(commands.Cog):
         """
         await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Privacy Policy",
                 description=dedent("""
                     RPANBot only stores information when it is needed to provide one of its features. The bot only stores stream notification settings and custom guild prefixes, which are both provided to it by you setting up those particular features.
@@ -131,9 +130,9 @@ class General(commands.Cog):
 
                     When the bot leaves/is removed from a guild, it'll attempt to delete any settings it has stored for it.
                 """).strip(),
-                footer_text=f"Requested by {ctx.author}",
+                user=ctx.author,
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
@@ -142,12 +141,12 @@ class General(commands.Cog):
         """
         Send feedback to the bot's developers.
         """
-        feedback_channel = await self.bot.fetch_channel(727205462377758810)
+        feedback_channel = await self.bot.find_channel(727205462377758810)
 
         user = ctx.author
         await feedback_channel.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="New Feedback!",
                 thumbnail=ctx.author.avatar_url,
                 fields={
@@ -155,17 +154,18 @@ class General(commands.Cog):
                     "User": f"{user.name}#{user.discriminator} ({user.id})",
                     "Guild": f"{ctx.guild.name} ({ctx.guild.id})",
                 },
-                footer_text="None",
                 bot=self.bot,
-                message=ctx.message
+                message=ctx.message,
             ),
         )
 
         await ctx.send(
             "",
-            embed=generate_embed(
-                title="Feedback Sent!", description="Thanks for your help!",
-                bot=self.bot, message=ctx.message
+            embed=RPANEmbed(
+                title="Feedback Sent!",
+                description="Thanks for your help!",
+                bot=self.bot,
+                message=ctx.message,
             ),
         )
 

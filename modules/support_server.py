@@ -5,8 +5,8 @@ import asyncio
 from re import search
 from base36 import dumps, loads
 
-from utils.helpers import generate_embed, is_main_dev, is_rpan_bot_guild
-from utils.settings import get_approved_bugs_channel, get_bug_reports_channel, get_denied_bugs_channel
+from utils.classes import RPANEmbed
+from utils.checks import is_main_dev, is_rpan_bot_guild
 
 def author_channel_check(author, channel):
     def inner_check(message):
@@ -27,10 +27,10 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         if ctx.invoked_subcommand is None:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Tracking",
                     description="You are authorised to use this command, but input an invalid subcommand.",
-                    footer_text="None",
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -45,7 +45,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         try:
             desc_ask = await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Step 1/4",
                     fields={
                         "Answer with": "A short description, around one sentence",
@@ -61,7 +61,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
 
             repro_ask = await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Step 2/4",
                     fields={
                         "Answer with": "The steps to reproduce the bug",
@@ -77,7 +77,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
 
             exp_ask = await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Step 3/4",
                     fields={
                         "Answer with": "The expected result",
@@ -93,7 +93,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
 
             act_ask = await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Step 3/4",
                     fields={
                         "Answer with": "The actual result",
@@ -109,23 +109,23 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         except asyncio.TimeoutError:
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Error",
                     description="This command timed out.",
-                    color=Color(0x8B0000),
-                    footer_text="Requested by {}".format(str(ctx.author)),
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
             )
             return
 
-        channel = await self.bot.fetch_channel(get_bug_reports_channel())
+        channel = await self.bot.find_channel(self.bot.settings.ids.bug_reports_channel)
 
         embed = Embed(
             title="Bug Report - New",
             description=description.content,
-            color=Color(0x00688B),
+            colour=0x00688B,
         )
         embed.set_author(name=str(ctx.author), icon_url=str(ctx.author.avatar_url))
 
@@ -145,7 +145,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
 
         confirmation = await ctx.send(
             "",
-            embed=generate_embed(
+            embed=RPANEmbed(
                 title="Bug Report - Success",
                 description=f"Your bug report has been placed in {channel.mention} for approval/denial.",
             ),
@@ -172,11 +172,11 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         if isinstance(error, commands.errors.CheckFailure):
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Error",
                     description="This command is limited to certain Discord servers.",
-                    color=Color(0x8B0000),
-                    footer_text="Requested by {}".format(str(ctx.author)),
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -184,12 +184,11 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         elif isinstance(error, commands.errors.CommandOnCooldown):
             await ctx.send(
                 "",
-                embed=generate_embed(
+                embed=RPANEmbed(
                     title="Bug Report - Error",
-                    description="This command is currently on cooldown to prevent spam and ratelimiting.\n%.2fs remaining."
-                    % error.retry_after,
-                    color=Color(0x8B0000),
-                    footer_text="Requested by {}".format(str(ctx.author)),
+                    description="This command is currently on cooldown to prevent spam and ratelimiting.\n%.2fs remaining." % error.retry_after,
+                    colour=0x8B0000,
+                    user=ctx.author,
                     bot=self.bot,
                     message=ctx.message,
                 ),
@@ -205,7 +204,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         Approve a bug report
         """
         report_message_id = loads(report_id)
-        channel = await self.bot.fetch_channel(get_bug_reports_channel())
+        channel = await self.bot.find_channel(self.bot.settings.ids.bug_reports_channel)
         report_message = await channel.fetch_message(report_message_id)
 
         embed = report_message.embeds[0]
@@ -219,7 +218,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         embed.set_author(name=result.group(1), icon_url=embed.author.icon_url)
 
         await report_message.delete()
-        approved_channel = await self.bot.fetch_channel(get_approved_bugs_channel())
+        approved_channel = await self.bot.find_channel(self.bot.settings.ids.approved_bugs_channel)
         await approved_channel.send("", embed=embed)
 
         confirmation_message = await ctx.send(
@@ -237,7 +236,7 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         Deny a bug report
         """
         report_message_id = loads(report_id)
-        channel = await self.bot.fetch_channel(get_bug_reports_channel())
+        channel = await self.bot.find_channel(self.bot.settings.ids.bug_reports_channel)
         report_message = await channel.fetch_message(report_message_id)
 
         embed = report_message.embeds[0]
@@ -251,12 +250,10 @@ class SupportServer(commands.Cog, name="RPANBot Support Server"):
         embed.set_author(name=result.group(1), icon_url=embed.author.icon_url)
 
         await report_message.delete()
-        denied_channel = await self.bot.fetch_channel(get_denied_bugs_channel())
+        denied_channel = await self.bot.find_channel(self.bot.settings.ids.denied_bugs_channel)
         await denied_channel.send("", embed=embed)
 
-        confirmation_message = await ctx.send(
-            f"You've denied the report with ID: {report_id}"
-        )
+        confirmation_message = await ctx.send(f"You've denied the report with ID: {report_id}")
 
         await asyncio.sleep(5)
         await ctx.message.delete()

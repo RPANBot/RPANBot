@@ -1,17 +1,14 @@
 # Stream Notifications Module
-import discord
 import requests
 
 from time import sleep
 from threading import Thread
 
-from json import loads, dumps
 from requests import post
+from json import loads, dumps
 
-from utils.reddit import get_reddit
-from utils.helpers import generate_embed, format_timestamp
+from utils.helpers import format_timestamp
 from utils.classes import Broadcast, Broadcasts
-from utils.settings import get_error_channel, get_rpan_subreddits
 from utils.database import BNSetting, generate_db_session
 
 class BroadcastNotifications:
@@ -25,7 +22,7 @@ class BroadcastNotifications:
         try:
             data = dumps({
                 "username": "RPANBot",
-                "avatar_url": self.bot.bot_avatar_link,
+                "avatar_url": self.bot.settings.links.bot_avatar,
                 "content": ("" if bn_setting.custom_text == None else bn_setting.custom_text),
                 "embeds": [
                     {
@@ -65,10 +62,14 @@ class BroadcastNotifications:
     def watch_broadcasts(self):
         # Setup a stream to watch all new items on RPAN subreddits.
         session = generate_db_session()
-        for submission in get_reddit().subreddit("+".join(get_rpan_subreddits())).stream.submissions(skip_existing=True):
+        for submission in self.bot.reddit.rpan_subreddits.stream.submissions(skip_existing=True):
             try:
-                username_search_string = f'"{submission.author.name.lower()}"'
+                username = submission.author.name.lower()
+                username_search_string = f'"{username}"'
                 result = session.query(BNSetting).filter(BNSetting.usernames.contains(username_search_string)).all()
+                if username in self.bot.reddit.mods:
+                    result.append(session.query(BNSetting).filter(BNSetting.usernames.contains(f'"rpanbot"')).all())
+
                 if len(result) >= 1:
                     broadcasts = Broadcasts()
                     broadcast = broadcasts.has_broadcast(submission.id.replace("t3_",""))

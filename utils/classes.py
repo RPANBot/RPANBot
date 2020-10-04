@@ -1,4 +1,4 @@
-from discord import Embed
+from discord import Embed, Colour, Message
 
 from time import sleep
 from requests import get
@@ -7,15 +7,85 @@ from typing import Union
 
 from json import loads, dumps
 
-from .helpers import format_timestamp
-from .settings import get_rpan_subreddits
-from .database import BNSetting, get_db_session
+from utils.settings import get_settings
+from utils.helpers import format_timestamp
+from utils.database import BNSetting, get_db_session
+
+class RPANEmbed(Embed):
+    def __init__(
+        self,
+
+        title: str,
+        description: str = "",
+        url: str = "",
+
+        colour: Union[int, Colour] = 0x00688B,
+
+        fields: dict = {},
+        thumbnail: str = None,
+
+        user = None,
+        footer_text: str = None,
+
+        bot = None,
+        message: Message = None,
+    ) -> None:
+        """
+        Generates a standard bot embed.
+
+        :param title: The embed's title.
+        :param description: The embed's description.
+        :param url: The URL permalink used in the title.
+
+        :param colour: The colour of the embed.
+
+        :param fields: The embed's fields (given as a dict).
+        :param thumbnail: The thumbnail that the embed should use.
+
+        :param user: The user who has requested a command (if any).
+        :param footer_text: Text that should be used in the embed's footer.
+
+        :param bot: The bot instance. This is used to get the custom prefix.
+        :param message: The message. This is used to get the custom prefix.
+
+        :return: An embed generated to the specifications.
+        """
+        if isinstance(colour, int):
+            colour = Colour(colour)
+
+        super().__init__(
+            title=title,
+            description=description,
+            url=url,
+            colour=colour,
+        )
+
+        for key, value in fields.items():
+            self.add_field(name=key, value=value)
+
+        if thumbnail:
+            self.set_thumbnail(url=thumbnail)
+
+        if user:
+            requested_by_text = f"Requested by {user}"
+            if footer_text:
+                footer_text = requested_by_text + " ● " + footer_text
+            else:
+                footer_text = requested_by_text
+
+        if footer_text:
+            if message:
+                self.set_footer(text=f"{footer_text} ● Bot by {bot.get_relevant_prefix(message)}contributors")
+            else:
+                self.set_footer(text=footer_text)
+        else:
+            if message:
+                self.set_footer(text=f"Bot by {bot.get_relevant_prefix(message)}contributors")
 
 class Broadcast:
-    def __init__(self, id=None, broadcast_info=None, retry=False):
+    def __init__(self, id=None, broadcast_info=None, retry=False) -> None:
         """
         Initiate a Broadcast class.
-
         :param id: The id of the broadcast.
         :param broadcast_info: Sometimes provided to the object instead of having to fetch it.
         :param retry: Whether the bot should retry fetching info on an API error.
@@ -48,7 +118,7 @@ class Broadcast:
             if retry:
                 self.retry()
 
-    def request_broadcast_json(self):
+    def request_broadcast_json(self) -> dict:
         """
         Requests the broadcast information from the API.
         :return: JSON of the broadcast info.
@@ -56,7 +126,7 @@ class Broadcast:
         request = get(f"https://strapi.reddit.com/broadcasts/{self.id}", headers={"Cache-Control": "no-cache"})
         return request.json()
 
-    def check_attributes(self, broadcast_info=None, set_retry=False):
+    def check_attributes(self, broadcast_info=None, set_retry=False) -> None:
         """
         Validates that the info has everything that's required.
         :param broadcast_info: The information to check from.
@@ -78,7 +148,7 @@ class Broadcast:
             if self.retry_on_failure:
                 self.retry()
 
-    def set_attributes(self, broadcast_info):
+    def set_attributes(self, broadcast_info) -> None:
         """
         Sets the attributes of the Broadcast object.
         :param broadcast_info: The information to parse.
@@ -117,7 +187,7 @@ class Broadcast:
 
             self.thumbnail = broadcast_info["stream"]["thumbnail"]
 
-    def refresh_information(self):
+    def refresh_information(self) -> None:
         # Make another call to the strapi.
         request_json = self.request_broadcast_json()
         self.api_status = request_json["status"]
@@ -126,17 +196,17 @@ class Broadcast:
         if self.api_status == "success":
             self.set_attributes(request_json["data"])
 
-    def retry(self):
+    def retry(self) -> None:
         if not self.already_retried:
             self.already_retried = True
             sleep(2.5)
             self.refresh_information()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Broadcast({self.id})"
 
 class Broadcasts:
-    def __init__(self, starting_broadcasts=None):
+    def __init__(self, starting_broadcasts=None) -> None:
         self.broadcasts = []
         if starting_broadcasts != None:
             self.broadcasts = starting_broadcasts
@@ -154,7 +224,12 @@ class Broadcasts:
         else:
             self.api_status = "success"
 
-    def get_top(self, subreddit=None):
+    def get_top(self, subreddit=None) -> Union[Broadcast, None]:
+        """
+        Gets the top broadcast (optionally on a specific subreddit)
+        :param subreddit: The subreddit to get the top broadcast on.
+        :return: The top broadcast or None.
+        """
         if len(self.broadcasts) >= 1:
             if subreddit == None:
                 return self.broadcasts[0]
@@ -167,25 +242,33 @@ class Broadcasts:
         else:
             return None
 
-    def has_broadcast(self, id):
+    def has_broadcast(self, id) -> Union[Broadcast, bool]:
+        """
+        Checks (and finds if any) a broadcast of a specific id in the list.
+        :return: The broadcast or false if there isn't one with a matching id.
+        """
         for broadcast in self.broadcasts:
             if broadcast.id == id:
                 return broadcast
         return False
 
-    def has_streamer(self, name):
+    def has_streamer(self, name) -> Union[Broadcast, bool]:
+        """
+        Checks if there is a broadcaster with a specific name in the list.
+        :return: Either false or the user's broadcast.
+        """
         name = name.lower()
         for broadcast in self.broadcasts:
             if broadcast.author_name.lower() == name:
                 return broadcast
         return False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Broadcasts({', '.join([str(item) for item in self.broadcasts])})"
 
 class PushshiftBroadcasts:
-    def __init__(self, username):
-        request = get(f"https://api.pushshift.io/reddit/submission/search?author={username}&subreddit={','.join(get_rpan_subreddits())}&filter=id,link_flair_text")
+    def __init__(self, username) -> None:
+        request = get(f"https://api.pushshift.io/reddit/submission/search?author={username}&subreddit={','.join(get_settings().reddit.rpan_subreddits)}&filter=id,link_flair_text")
         request_data = request.json()["data"]
 
         self.broadcasts_ids = []
@@ -198,7 +281,11 @@ class PushshiftBroadcasts:
                 except:
                     pass
 
-    def find_undeleted(self):
+    def find_undeleted(self) -> Union[Broadcast, None]:
+        """
+        Find the user's latest undeleted broadcast.
+        :return: The user's latest undeleted broadcast (or None).
+        """
         if len(self.broadcasts_ids) >= 1:
             for stream_id in self.broadcasts_ids[0:4]:
                 broadcast = Broadcast(stream_id)
@@ -207,11 +294,11 @@ class PushshiftBroadcasts:
                         return broadcast
         return None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Broadcasts({', '.join([str(item) for item in self.broadcasts])})"
 
 class BroadcastNotifSettingsHandler:
-    def __init__(self):
+    def __init__(self) -> None:
         # Stores which broadcast notifications setting is currently selected by the guild.
         # A local id is the id of a broadcast notification setting inside the guild list.
         self.selections = {}
