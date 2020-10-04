@@ -250,14 +250,12 @@ class Developer(commands.Cog):
             g = cmd.Git(getcwd())
             g.pull()
             await message.edit(
-                "",
                 embed=RPANEmbed(
                     title="Development - Pull Succesful"
                 )
             )
         except:
             await message.edit(
-                content="",
                 embed=RPANEmbed(
                     title="Development - Pull Failed",
                     colour=0x8B0000,
