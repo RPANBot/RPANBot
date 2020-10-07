@@ -422,7 +422,7 @@ class Developer(commands.Cog):
                 embed=RPANEmbed(
                     title="Guild Leave",
                     fields={
-                        "Name": guild.id,
+                        "Name": guild.name,
                         "Owner": str(guild.owner),
                         "ID": id,
                     },

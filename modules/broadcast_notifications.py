@@ -68,7 +68,7 @@ class BroadcastNotifications:
                 username_search_string = f'"{username}"'
                 result = session.query(BNSetting).filter(BNSetting.usernames.contains(username_search_string)).all()
                 if username in self.bot.reddit.mods:
-                    result.append(session.query(BNSetting).filter(BNSetting.usernames.contains(f'"rpanbot"')).all())
+                    result += session.query(BNSetting).filter(BNSetting.usernames.contains(f'"rpanbot"')).all()
 
                 if len(result) >= 1:
                     broadcasts = Broadcasts()
@@ -81,7 +81,7 @@ class BroadcastNotifications:
 
                     if broadcast.api_status == "success":
                         if submission.author.name.lower() != broadcast.author_name.lower():
-                            self.bot.sentry.capture_message(f"NOTIFS DEBUG\nDetected non matching names from API result.\nNames: {submission.author.name} and {broadcast.author_name}\nBroadcast: {submission.permalink} and {broadcast.url}")
+                            self.bot.sentry.capture_message(f"NOTIFS DEBUG - Detected non matching names from API result.\nNames: {submission.author.name} and {broadcast.author_name}\nBroadcast: {submission.permalink} and {broadcast.url}")
                             continue
 
                         for bn_setting in result:
@@ -93,7 +93,7 @@ class BroadcastNotifications:
 
                             self.send_broadcast_notification(bn_setting, broadcast)
                     else:
-                        self.bot.sentry.capture_message(f"NOTIFS DEBUG\nUnsuccesful API result.\nStatus: {broadcast.api_status}\nAuthor: {submission.author.name}\nPermalink: {submission.permalink}")
+                        self.bot.sentry.capture_message(f"NOTIFS DEBUG - Unsuccesful API result.\nStatus: {broadcast.api_status}\nAuthor: {submission.author.name}\nPermalink: {submission.permalink}")
             except Exception as e:
                 print(e)
                 self.bot.sentry.capture_exception(e)
