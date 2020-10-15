@@ -260,7 +260,7 @@ class RPAN(commands.Cog):
 
         embed = RPANEmbed(
             title="Click here to go to the report page.",
-            description="Did you find a user that is violating the Reddit Content Policy but don’t know how to report them? Just head on over to reddit.com/report (or click above) and you can report the user there.",
+            description="If you need to report a user, comment, or post, please go to https://reddit.com/report (or click above) and report the content there. If you cannot find a category for the content you want to report, then send a message to r/reddit.com with the content.",
             url="https://reddit.com/report",
             user=ctx.author,
             bot=self.bot,
