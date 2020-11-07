@@ -1,0 +1,39 @@
+# Database Connection Info
+database:
+    host: database
+    port: 5432
+    db: rpanbot
+    user: rpanbot
+    password: rpanbot
+
+# Web Settings
+web:
+    config:
+        DEBUG: True
+        SECRET_KEY: "debug"
+    callbacks:
+        login: "http://127.0.0.1:5050/callback"
+
+# Discord Channels
+channels:
+    logs:
+        join_leave: 000000000000000000
+        error: 000000000000000000
+    bugs:
+        reports: 000000000000000000
+        approved: 000000000000000000
+        denied: 000000000000000000
+
+# Bot Support Guilds (where the bug report commands are enabled)
+bot_support_guilds:
+    - 725895559973699645  # RPANBot Support Guild
+
+# RPAN Subreddit Guilds (where the report command is enabled)
+rpan_guilds:
+    - 725895559973699645  # RPANBot Support Guild
+
+# Main Bot Developers (given access to developer commands)
+bot_developer_ids:
+    - 564751291100823552  # OneUpPotato
+    - 554807126174990349  # JayRy27
+    - 466677474672246800  # bsoyka

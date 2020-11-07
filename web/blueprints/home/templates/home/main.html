@@ -1,0 +1,57 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="jumbotron jumbotron-fluid border-bottom border-dark" style="background-color: rgba(0, 0, 0, 0.65);">
+  <div class="container text-light">
+    <h1 class="display-4">
+      <img src="{{ url_for('static', filename='imgs/rounded-64.png') }}" width="64" height="64" class="align-top">
+      RPANBot
+    </h1>
+    <p class="lead">A user-made bot helping link Reddit Public Access Network and Discord.</p>
+    <p class="lead">
+      <a class="btn btn-orangered btn-lg" href="https://reddit.com/rpan/">Watch RPAN</a>
+      <a class="btn btn-orange btn-lg text-light" href="{{ invite_link }}">Invite the Bot</a>
+      {% if user.is_real %}<a class="btn btn-mango btn-lg text-light" href="{{ url_for('dashboard.main') }}">Your Guilds</a>{% endif %}
+    </p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card bg-dark">
+    <div class="card-header">Info</div>
+    <div class="card-body">
+      <p>RPANBot is the bot that connects the Reddit Public Access Network and Discord together.</p>
+      <p>The bot has a variety of features such as:</p>
+      <ul>
+        <li>Stream Notifications <span class="text-muted">- Get a message sent to a channel when certain users go live.</span></li>
+        <li>Stream Statistics <span class="text-muted">- Get information on your broadcasts (such as unique viewers, current viewers, etc).</span></li>
+        <li>Top Broadcast <span class="text-muted">- Get the current top broadcast on RPAN.</span></li>
+        <li>and more..</li>
+      </ul>
+
+      <a class="btn btn-outline-orangered" href="{{ url_for('home.features') }}">Learn More</a>
+    </div>
+  </div>
+
+  <hr class="my-3">
+
+  <div class="card bg-dark">
+    <div class="card-header">Open Source</div>
+    <div class="card-body">
+      <p>The code behind RPANBot is open source under the Apache License.</p>
+      <p>You are free to help contribute to RPANBot, or otherwise just look through the code.</p>
+      <a class="btn btn-outline-orangered" href="https://github.com/RPANBot/RPANBot/">View on GitHub</a>
+    </div>
+  </div>
+
+  <hr class="my-3">
+
+  <div class="card bg-dark">
+    <div class="card-header">Web Dashboard</div>
+    <div class="card-body">
+      <p>Easily configure the bot for your Discord guild.</p>
+      <p>RPANBot has a web dashboard that allows you to easy change certain settings in the bot.</p>
+      <a class="btn btn-outline-orangered" href="{{ url_for('dashboard.main') }}">Access Dashboard</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="container pt-5">
+  <div class="card bg-dark">
+    <div class="card-header"><h3>RPANBot Privacy Policy</h3></div>
+    <div class="card-body">
+      <b>When does the bot store info?</b>
+      <p>RPANBot only stores information when it is needed to provide one of its features.</p>
+
+      <b>When is data removed or how can I remove it?</b>
+      <p>You can delete your stream notifications settings using a command and set the custom prefix back to the bot's default prefix.</p>
+      <p>When the bot leaves or is removed from a guild it will attempt to delete any settings it has stored for that guild.</p>
+      <p>Alternatively, you can contact the developers using the bot's feedback command requesting that any settings for your guild be deleted.</p>
+
+      <b>What information does RPANBot store?</b>
+      <ul>
+        <li>Broadcast Notification Settings</li>
+        <li>Custom Guild Prefixes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

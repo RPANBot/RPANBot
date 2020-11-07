@@ -1,0 +1,62 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="container pt-5">
+  <div class="card bg-dark">
+    <div class="card-header"><h3>Features</h3></div>
+    <div class="card-body">
+      <div id="notifications">
+        <div class="row">
+          <div class="col-12 col-lg">
+            <h4>Broadcast Notifications</h4>
+            <p>Receive notifications to channels when a user goes live.</p>
+            <p>This can be setup through either commands or by using the bot's web dashboard.</p>
+            <p>There is also the ability to filter notifications by the title containing specific keywords.</p>
+            <p>You can set some custom text (which can include pings) to be sent with notifications per channel.</p>
+            <p>Use the <code>!streamnotif help</code> command for more info on setting this up with commands.</p>
+          </div>
+          <div class="col-12 col-sm text-center"><img width="425" src="{{ url_for('static', filename='imgs/features/stream_notifications.jpg') }}"></div>
+        </div>
+      </div>
+
+      <div class="pt-4" id="top-broadcast">
+        <div class="row">
+          <div class="col-12 col-lg">
+            <h4>Top Broadcast</h4>
+            <p>View the current top broadcast on RPAN.</p>
+            <p>There is also the option to view the top stream on specific subreddits.</p>
+            <p>Usage: <code>!topstream (*optional* subreddit)</code></p>
+          </div>
+          <div class="col-12 col-sm text-center"><img width="425" src="{{ url_for('static', filename='imgs/features/top_stream.jpg') }}"></div>
+        </div>
+      </div>
+
+      <div class="pt-4" id="top-broadcasts">
+        <div class="row">
+          <div class="col-12 col-lg">
+            <h4>Top Broadcasts</h4>
+            <p>View the top broadcasts of the day, week, month or year on each RPAN subreddit.</p>
+            <p>Usage: <code>!topstreams (*optional* time frame)</code></p>
+          </div>
+          <div class="col-12 col-sm text-center"><img height="250" src="{{ url_for('static', filename='imgs/features/top_streams.jpg') }}"></div>
+        </div>
+      </div>
+
+      <div class="pt-4" id="broadcast-stats">
+        <div class="row">
+          <div class="col-12 col-lg">
+            <h4>Broadcast Statistics</h4>
+            <p>View some statistics on a currently live, or off the air, broadcast.</p>
+            <p>Usage: <code>!streamstats (link to stream)</code></p>
+          </div>
+          <div class="col-12 col-sm text-center"><img height="250" src="{{ url_for('static', filename='imgs/features/stream_stats.jpg') }}"></div>
+        </div>
+      </div>
+
+      <div class="pt-5">
+        <h4>Have any feature requests?</h4>
+        <p>Feel free to suggest them on the bot's support guild, or contribute to the bot on GitHub.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+<nav class="col-md-2 d-none d-md-block bg-dark sidebar">
+  <div class="sidebar-sticky">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-2 mb-1 text-muted">Main</h6>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard.main') }}">Homepage</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ support_invite }}">Support Guild</a></li>
+    </ul>
+
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">Select Guild</h6>
+    <ul class="nav flex-column mb-2">
+      <li class="nav-item"><a class="nav-link text-blue" href="{{ invite_link }}">Invite to Guild</a></li>
+      {% if user.is_real %}
+        {% for guild in user.guilds %}
+        {% if guild.bot_guild %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard.guild', id=guild.id) }}">{{ guild.name }}</a></li>
+        {% else %}
+        <li class="nav-item"><a class="nav-link text-muted" href="{{ invite_link }}">{{ guild.name }}</a></li>
+        {% endif %}
+        {% endfor %}
+      {% else %}
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('home.login') }}">Login with Discord</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

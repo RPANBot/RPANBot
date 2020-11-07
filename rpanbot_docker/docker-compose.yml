@@ -1,0 +1,39 @@
+version: "3.8"
+
+volumes:
+    postgres:
+
+services:
+    bot:
+        build:
+            context: ../
+            dockerfile: rpanbot_docker/Dockerfile
+        restart: unless-stopped
+
+        depends_on:
+            database:
+                condition: service_healthy
+
+        ports:
+            - "5050:5050"
+
+        env_file:
+            - ../configs/bot.env
+
+    database:
+        image: postgres:13
+        restart: unless-stopped
+
+        volumes:
+            - postgres:/var/lib/postgresql/data
+
+        healthcheck:
+            test:
+                - "CMD-SHELL"
+                - "pg_isready -U $$POSTGRES_USER"
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
+        env_file:
+            - ../configs/database.env

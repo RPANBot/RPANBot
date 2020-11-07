@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="{{ url_for('home.main') }}">
+    <img src="{{ url_for('static', filename='imgs/rounded-32.png') }}" width="30" height="30" class="d-inline-block align-top">
+    RPANBot
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+  <div class="collapse navbar-collapse" id="navbar">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item{% if request.url_rule.endpoint == 'home.main' %} active{% endif %}"><a class="nav-link" href="{{ url_for('home.main') }}">Home</a></li>
+      <li class="nav-item{% if request.url_rule.endpoint == 'home.features' %} active{% endif %}"><a class="nav-link" href="{{ url_for('home.features') }}">Features</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ invite_link }}">Invite</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ support_invite }}">Support</a></li>
+    </ul>
+    <ul class="navbar-nav">
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard.main') }}">Web Dashboard</a></li>
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,39 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  {% if user.is_real %}
+  <div class="card bg-dark">
+    <div class="card-header">Hello {{ user.tag }}!</div>
+    <div class="card-body">
+      {% if user.guilds %}
+        <p>You can select one of your guilds below or in the sidebar.</p>
+        <div class="row">
+        {% for guild in user.guilds %}{% if guild.bot_guild %}
+        <div class="col-6 col-sm-4 col-lg-2 col-xl-2 pb-4">
+          <div class="card text-light" style="background-color: #000;">
+            <img class="card-img-top" src="{{ get_guild_icon(guild) }}">
+            <div class="card-body text-center">
+              <h5 class="card-title">{{ guild.name }}</h5>
+              <a href="{{ url_for('dashboard.guild', id=guild.id) }}" class="btn btn-outline-teal">Edit Settings</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}{% endfor %}
+        </div>
+      {% else %}
+      <p>You currently do not have any guilds with RPANBot on (that you also have Manage Guild permissions on).</p>
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card bg-dark">
+    <div class="card-header">Welcome!</div>
+    <div class="card-body">
+      <p>Please login to get started with configuring the bot on your guilds.</p>
+
+      <a class="btn btn-outline-teal" href="{{ url_for('home.login') }}">Login with Discord</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

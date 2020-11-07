@@ -1,0 +1,16 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  background-image: url("../imgs/bg.png");
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}

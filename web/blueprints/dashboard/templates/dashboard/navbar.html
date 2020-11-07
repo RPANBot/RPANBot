@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark border-bottom border-dark" style="border-color: #000 !important;">
+  <a class="navbar-brand" href="{{ url_for('home.main') }}">
+    <img src="{{ url_for('static', filename='imgs/rounded-32.png') }}" width="30" height="30" class="d-inline-block align-top">
+    RPANBot
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+  <div class="collapse navbar-collapse" id="navbar">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('home.main') }}">Home</a></li>
+      <li class="nav-item active"><a class="nav-link" href="{{ url_for('dashboard.main') }}">Dashboard</a></li>
+    </ul>
+    <ul class="navbar-nav">
+      {% if user.is_real %}
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="user-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.tag }}</a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown">
+          <a class="dropdown-item" href="{{ url_for('dashboard.main') }}">Your Guilds</a>
+          {% if not user.refreshed_before %}<a class="dropdown-item" href="{{ url_for('dashboard.refresh') }}">Refresh your Guilds</a>{% endif %}
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{{ url_for('home.logout') }}">Log Out</a>
+        </div>
+      </li>
+      {% else %}
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('home.login') }}">Login with Discord</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
