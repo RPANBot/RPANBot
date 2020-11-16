@@ -14,6 +14,11 @@ web:
     callbacks:
         login: "http://127.0.0.1:5050/callback"
 
+# Default Bot Prefixes
+default_prefixes:
+    - "r!"
+    - "rpan!"
+
 # Discord Channels
 channels:
     logs:
@@ -23,10 +28,9 @@ channels:
         reports: 000000000000000000
         approved: 000000000000000000
         denied: 000000000000000000
-
-# Bot Support Guilds (where the bug report commands are enabled)
-bot_support_guilds:
-    - 725895559973699645  # RPANBot Support Guild
+    developer:
+        contact: 000000000000000000
+        exclusions_and_spam: 000000000000000000
 
 # RPAN Subreddit Guilds (where the report command is enabled)
 rpan_guilds:

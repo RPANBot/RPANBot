@@ -29,6 +29,18 @@
       </ul>
 
       <a class="btn btn-outline-orangered" href="{{ url_for('home.features') }}">Learn More</a>
+      <a class="btn btn-outline-orange ml-1" href="{{ url_for('home.commands') }}">Commands</a>
+    </div>
+  </div>
+
+  <hr class="my-3">
+
+  <div class="card bg-dark">
+    <div class="card-header">Web Dashboard</div>
+    <div class="card-body">
+      <p>The ability to easily configure the bot for your Discord guild.</p>
+      <p>RPANBot has a web dashboard that allows you to quickly change certain settings in the bot with ease.</p>
+      <a class="btn btn-outline-orangered" href="{{ url_for('dashboard.main') }}">Access Dashboard</a>
     </div>
   </div>
 
@@ -39,18 +51,10 @@
     <div class="card-body">
       <p>The code behind RPANBot is open source under the Apache License.</p>
       <p>You are free to help contribute to RPANBot, or otherwise just look through the code.</p>
+      <p>Please also feel free to request new features on the support guild or subreddit.</p>
       <a class="btn btn-outline-orangered" href="https://github.com/RPANBot/RPANBot/">View on GitHub</a>
-    </div>
-  </div>
-
-  <hr class="my-3">
-
-  <div class="card bg-dark">
-    <div class="card-header">Web Dashboard</div>
-    <div class="card-body">
-      <p>Easily configure the bot for your Discord guild.</p>
-      <p>RPANBot has a web dashboard that allows you to easy change certain settings in the bot.</p>
-      <a class="btn btn-outline-orangered" href="{{ url_for('dashboard.main') }}">Access Dashboard</a>
+      <a class="btn btn-outline-orange ml-1" href="{{ support_invite }}">Support Guild</a>
+      <a class="btn btn-outline-mango ml-1" href="https://reddit.com/r/RPANBot">Subreddit</a>
     </div>
   </div>
 </div>

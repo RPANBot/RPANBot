@@ -7,6 +7,7 @@
     <div class="card-body">
       {% if user.guilds %}
         <p>You can select one of your guilds below or in the sidebar.</p>
+        <p>If no guilds are shown below, then you need to invite the bot to one of your guilds.</p>
         <div class="row">
         {% for guild in user.guilds %}{% if guild.bot_guild %}
         <div class="col-6 col-sm-4 col-lg-2 col-xl-2 pb-4">

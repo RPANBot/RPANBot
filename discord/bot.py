@@ -13,32 +13,53 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from discord import Activity, ActivityType, TextChannel
-from discord.ext.commands import Bot
+from discord import Activity, ActivityType, Intents, TextChannel, Guild
+from discord.ext.commands import Bot, check, when_mentioned_or
 
 from typing import Union
 
 from traceback import print_exc
+
+from expiringdict import ExpiringDict
+
+from utils.database.models.exclusions import ExcludedUser
+from utils.database.models.custom_prefixes import CustomPrefixes
 
 
 class RPANBot(Bot):
     def __init__(self, core) -> None:
         self.core = core
 
+        bot_intents = Intents.default()
+        bot_intents.members = True
+
         super().__init__(
-            command_prefix=self.core.settings.discord.default_prefix,
+            command_prefix=self.get_trigger_prefix,
             description="RPANBot: A bot helping link Discord and RPAN.",
+
             case_insensitive=True,
+            intents=bot_intents,
+
             activity=Activity(
                 type=ActivityType.watching,
                 name="RPAN | rpanbot.botcavern.xyz",
             ),
         )
 
+        # Start a database session.
+        self.db_session = self.core.db_handler.Session()
+
         # Load the modules.
         self.module_prefix = "discord.modules.{name}"
         modules = [
             "general",
+            "rpan",
+            "events",
+            "management",
+            "developer",
+            "notifications_watcher",
+            "help_command",
+            "tasks",
         ]
 
         for module in modules:
@@ -49,8 +70,51 @@ class RPANBot(Bot):
                 print(f"DISCORD: Failed to load {module}.")
                 print_exc()
 
-    def start_bot(self) -> None:
-        self.run(self.core.settings.discord.token)
+        # Initiate some of the caches.
+        self.prefix_cache = ExpiringDict(max_len=25, max_age_seconds=1800)
+        self.excluded_user_cache = ExpiringDict(max_len=25, max_age_seconds=600)
+
+    def get_prefixes(self, guild: Guild) -> list:
+        if guild is None:
+            return self.core.settings.discord.default_prefixes
+
+        if guild.id in self.prefix_cache:
+            return self.prefix_cache[guild.id]
+        else:
+            result = self.db_session.query(CustomPrefixes).filter_by(guild_id=guild.id).first()
+            if result is None:
+                self.prefix_cache[guild.id] = self.core.settings.discord.default_prefixes
+                return self.prefix_cache[guild.id]
+            else:
+                self.prefix_cache[guild.id] = result.prefixes
+                return self.prefix_cache[guild.id]
+
+    def get_trigger_prefix(self, bot, message=None):
+        """
+        Get the trigger prefixes for a command (from a message).
+        :return: The prefixes that the bot should respond to for that message.
+        """
+        if message is None:
+            return self.core.settings.discord.default_prefixes
+
+        prefixes_to_use = self.get_prefixes(message.guild)
+        return when_mentioned_or(*prefixes_to_use)(self, message)
+
+    def is_excluded_user(self, user_id: int) -> bool:
+        """
+        Checks if a user is excluded from using the bot.
+        :return: If they are or not.
+        """
+        if user_id in self.excluded_user_cache:
+            return self.excluded_user_cache[user_id]
+
+        result = self.db_session.query(ExcludedUser).filter_by(user_id=user_id).first()
+        if result:
+            self.excluded_user_cache[user_id] = True
+        else:
+            self.excluded_user_cache[user_id] = False
+
+        return self.excluded_user_cache[user_id]
 
     async def on_ready(self) -> None:
         print("DISCORD: Started bot.")
@@ -58,16 +122,13 @@ class RPANBot(Bot):
 
     async def fetch_user_count(self) -> None:
         """
-        Fetches the total number of unique users in the guilds that RPANBot is in.
+        Fetches the total number of users in the guilds that RPANBot is in.
         """
         await self.wait_until_ready()
 
-        users = []
-        for guild in self.guilds:
-            async for member in guild.fetch_members(limit=None):
-                if member.id not in users:
-                    users.append(member.id)
-        self.user_count = len(users)
+        self.user_count = 0
+        for member in self.get_all_members():
+            self.user_count += 1
 
     async def find_channel(self, id: int) -> Union[TextChannel, None]:
         """
@@ -78,3 +139,6 @@ class RPANBot(Bot):
         if channel is None:
             channel = await self.fetch_channel(id)
         return channel
+
+    def start_bot(self) -> None:
+        self.run(self.core.settings.discord.token)

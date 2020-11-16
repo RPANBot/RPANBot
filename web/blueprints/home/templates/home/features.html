@@ -12,9 +12,9 @@
             <p>This can be setup through either commands or by using the bot's web dashboard.</p>
             <p>There is also the ability to filter notifications by the title containing specific keywords.</p>
             <p>You can set some custom text (which can include pings) to be sent with notifications per channel.</p>
-            <p>Use the <code>!streamnotif help</code> command for more info on setting this up with commands.</p>
+            <p>Use the <code>r!streamnotif help</code> command for more info on setting this up with commands.</p>
           </div>
-          <div class="col-12 col-sm text-center"><img width="425" src="{{ url_for('static', filename='imgs/features/stream_notifications.jpg') }}"></div>
+          <div class="col-12 col-sm text-center"><img class="card-img" src="{{ url_for('static', filename='imgs/features/stream_notifications.jpg') }}"></div>
         </div>
       </div>
 
@@ -24,9 +24,9 @@
             <h4>Top Broadcast</h4>
             <p>View the current top broadcast on RPAN.</p>
             <p>There is also the option to view the top stream on specific subreddits.</p>
-            <p>Usage: <code>!topstream (*optional* subreddit)</code></p>
+            <p>Usage: <code>r!topstream (*optional* subreddit)</code></p>
           </div>
-          <div class="col-12 col-sm text-center"><img width="425" src="{{ url_for('static', filename='imgs/features/top_stream.jpg') }}"></div>
+          <div class="col-12 col-sm text-center"><img class="card-img" src="{{ url_for('static', filename='imgs/features/top_stream.jpg') }}"></div>
         </div>
       </div>
 
@@ -35,9 +35,9 @@
           <div class="col-12 col-lg">
             <h4>Top Broadcasts</h4>
             <p>View the top broadcasts of the day, week, month or year on each RPAN subreddit.</p>
-            <p>Usage: <code>!topstreams (*optional* time frame)</code></p>
+            <p>Usage: <code>r!topstreams (*optional* time frame)</code></p>
           </div>
-          <div class="col-12 col-sm text-center"><img height="250" src="{{ url_for('static', filename='imgs/features/top_streams.jpg') }}"></div>
+          <div class="col-12 col-sm text-center"><img class="card-img" src="{{ url_for('static', filename='imgs/features/top_streams.jpg') }}"></div>
         </div>
       </div>
 
@@ -46,10 +46,14 @@
           <div class="col-12 col-lg">
             <h4>Broadcast Statistics</h4>
             <p>View some statistics on a currently live, or off the air, broadcast.</p>
-            <p>Usage: <code>!streamstats (link to stream)</code></p>
+            <p>Usage: <code>r!streamstats (link to stream)</code></p>
           </div>
-          <div class="col-12 col-sm text-center"><img height="250" src="{{ url_for('static', filename='imgs/features/stream_stats.jpg') }}"></div>
+          <div class="col-12 col-sm text-center"><img class="card-img" src="{{ url_for('static', filename='imgs/features/stream_stats.jpg') }}"></div>
         </div>
+      </div>
+
+      <div class="pt-5 text-center">
+        <a class="btn btn-outline-orangered" href="{{ url_for('home.commands') }}">View All Commands</a>
       </div>
 
       <div class="pt-5">

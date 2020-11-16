@@ -18,7 +18,7 @@ from quart import Quart, send_from_directory
 from os import environ
 from os.path import join
 
-from web.helpers.globals import get_guild_icon
+from web.helpers.globals import get_guild_icon, is_category_channel, is_text_channel
 from web.helpers.user_handler import UserHandler
 
 from web.blueprints.home.views import home_bp
@@ -28,6 +28,8 @@ from web.blueprints.dashboard.views import dashboard_bp
 def create_app(core) -> Quart:
     app = Quart(__name__)
     app.core = core
+
+    app.db_session = app.core.db_handler.Session()
 
     app.config.update(core.settings.web.config)
     if core.settings.web.config["DEBUG"]:
@@ -44,6 +46,9 @@ def create_app(core) -> Quart:
         )
 
     app.jinja_env.globals["get_guild_icon"] = get_guild_icon
+
+    app.jinja_env.filters["is_text_channel"] = is_text_channel
+    app.jinja_env.filters["is_category_channel"] = is_category_channel
 
     app.register_blueprint(home_bp)
     app.register_blueprint(dashboard_bp)

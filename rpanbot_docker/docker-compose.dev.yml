@@ -3,6 +3,10 @@ version: "3.8"
 volumes:
     postgres:
 
+networks:
+    rpanbot_network:
+        name: rpanbot_network
+
 services:
     bot:
         build:
@@ -10,15 +14,20 @@ services:
             dockerfile: rpanbot_docker/Dockerfile
         restart: unless-stopped
 
+        volumes:
+            - ../web:/rpanbot/web
+            - ../discord:/rpanbot/discord
+            - ../configs/config.yml:/rpanbot/configs/config.yml
+
         depends_on:
             database:
                 condition: service_healthy
 
+        networks:
+            - rpanbot_network
+
         ports:
             - "5050:5050"
-
-        volumes:
-            - ../web:/rpanbot/web
 
         env_file:
             - ../configs/bot.env
@@ -37,6 +46,9 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
+
+        networks:
+            - rpanbot_network
 
         env_file:
             - ../configs/database.env

@@ -3,6 +3,10 @@ version: "3.8"
 volumes:
     postgres:
 
+networks:
+    rpanbot_network:
+        name: rpanbot_network
+
 services:
     bot:
         build:
@@ -13,6 +17,9 @@ services:
         depends_on:
             database:
                 condition: service_healthy
+
+        networks:
+            - rpanbot_network
 
         ports:
             - "5050:5050"
@@ -34,6 +41,9 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
+
+        networks:
+            - rpanbot_network
 
         env_file:
             - ../configs/database.env

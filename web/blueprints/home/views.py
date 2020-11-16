@@ -28,6 +28,11 @@ async def features():
     return await render_template("home/features.html")
 
 
+@home_bp.route("/commands/")
+async def commands():
+    return await render_template("home/commands.html")
+
+
 @home_bp.route("/privacy/")
 async def privacy():
     return await render_template("home/privacy.html")
@@ -40,9 +45,12 @@ async def credits():
 
 @home_bp.route("/login/")
 async def login():
-    auth_url, state = current_app.user_handler.base_session(scopes=["identify", "guilds"]).authorization_url("https://discord.com/api/oauth2/authorize")
-    session["DISCORD_STATE"] = state
-    return redirect(auth_url)
+    if not current_app.user_handler.get_user().is_real:
+        auth_url, state = current_app.user_handler.base_session(scopes=["identify", "guilds"]).authorization_url("https://discord.com/api/oauth2/authorize")
+        session["DISCORD_STATE"] = state
+        return redirect(auth_url)
+    else:
+        return redirect(url_for("home.main"))
 
 
 @home_bp.route("/callback/")

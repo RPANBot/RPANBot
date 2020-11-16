@@ -13,21 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from discord import CategoryChannel, TextChannel
+from sqlalchemy import Column, Integer, ForeignKey
+
+from utils.database.models.base import Base
 
 
-from web.helpers.classes import Guild
+class BNMappedUser(Base):
+    __tablename__ = "bn_mapped_users"
 
+    user_id = Column(Integer, ForeignKey("bn_users.id"), primary_key=True)
+    setting_id = Column(Integer, ForeignKey("bn_settings.id"), primary_key=True)
 
-def get_guild_icon(guild: Guild, size: int = 128, format: str = "jpg") -> str:
-    if not guild.icon:
-        return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png"
-    return f"https://cdn.discordapp.com/icons/{guild.id}/{guild.icon}.{format}?size={size}"
-
-
-def is_text_channel(channel) -> bool:
-    return isinstance(channel, TextChannel)
-
-
-def is_category_channel(channel) -> bool:
-    return isinstance(channel, CategoryChannel)
+    def __repr__(self):
+        return f"BNMappedUser({self.setting_id}, {self.setting_id})"

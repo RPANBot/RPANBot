@@ -1,0 +1,87 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="container pt-5">
+  <div class="card bg-dark">
+    <div class="card-header"><h3>RPANBot Commands</h3></div>
+    <div class="card-body">
+      <p class="text-muted">Key: * = Optional Argument</p>
+
+      <hr/>
+
+      <h5>Bot Prefix</h5>
+      <p>The bot's default prefix is <code>r!</code>, but it can be customised, <a href="#custom-prefix">as shown here.</a></p>
+
+      <hr/>
+
+      <div id="general">
+        <h5>General Commands</h5>
+
+        <p><code>r!help</code> - View a list of all the bot's commands through Discord.</p>
+        <p><code>r!info</code> - View some of the bot's statistics.</p>
+        <p><code>r!ping</code> - View RPANBot's current latency.</p>
+        <p><code>r!contributors</code> - View a list of the people who have <a href="{{ url_for('home.credits') }}">helped make RPANBot.</a> 😃</p>
+        <p><code>r!invite</code> - Get a link to <a href="{{ invite_link }}">invite the bot to another guild.</a></p>
+        <p><code>r!website</code> - Provides a link to the bot's website; here.</p>
+        <p><code>r!support</code> - Get an invite link to the <a href="{{ support_invite }}">RPANBot Support Discord guild.</a></p>
+        <p><code>r!privacy</code> - View information on <a href="{{ url_for('home.privacy') }}">what data RPANBot stores</a> and where it is used.</p>
+        <p><code>r!contact (message)</code> - Send a message to the bot's developers. Feedback is always welcome :)</p>
+      </div>
+
+      <hr/>
+
+      <div id="rpan">
+        <h5>RPAN Commands</h5>
+
+        <p><code>r!topstream <span class="text-muted">(*subreddit)</span></code> - View the current top stream (optionally on a specific RPAN subreddit).</p>
+        <p><code>r!topstreams <span class="text-muted">(*time_period)</span></code> - View the top broadcasts from within a specified amount of time (defaultly a week).</p>
+        <p><code>r!streamstats (stream)</code> - Get some statistics on an RPAN stream.</p>
+        <p><code>r!viewstream (username)</code> - Find a user's last stream or currently live stream.</p>
+        <p><code>r!wiki</code> - Some say that some treasures lay in the <a href="https://reddit.com/r/pan/wiki/index">r/pan wiki.</a> <span class="text-dark">I wouldn't know though, as I haven't read it.</span></p> <!-- Another easter egg :) -->
+
+      </div>
+
+      <hr/>
+
+      <div id="management">
+        <h5>Management Commands</h5>
+        <p>The commands to modify guild settings. You might find the <a href="{{ url_for('dashboard.main') }}">web dashboard</a> easier for changing settings.</p>
+
+        <p class="text-muted pt-3">Note: The bot will always use its mention as a prefix.</p>
+        <p id="custom-prefix"><code>r!prefix set (prefix)</code> - Set a custom bot prefix. This command will override any other custom prefixes you have set.</p>
+        <p><code>r!prefix add (prefix)</code> - Add a custom bot prefix. You can have up to four custom prefixes that RPANBot will respond to.</p>
+        <p><code>r!prefix remove (prefix)</code> - Remove a custom prefix. If you remove all custom prefixes then the bot will default back to <code>r!</code>.</p>
+        <p><code>r!prefix reset</code> - Remove your custom prefixes and default back to <code>r!</code>.</p>
+
+        <a href="https://www.reddit.com/r/RPANBot/wiki/stream_notifications" style="color: inherit !important;"><p class="text-muted pt-4">Click here for a guide on setting up stream notifications.</p></a>
+        <p><code>r!streamnotifs</code> - View a list of stream notification setting commands.</p>
+        <p><code>r!streamnotifs list</code> - View all the setup stream notif channels on the current guild.</p>
+
+        <p class="pt-3"><code>r!streamnotifs setup (channel) <span class="text-muted">(*username)</span></code> - Add a new stream notification channel. More names can be added/removed from it later.</p>
+        <p><code>r!streamnotifs select (channel/id)</code> - Select a stream notification setting.</p>
+        <p><code>r!streamnotifs selected</code> - View some information on the currently selected channel.</p>
+
+        <p class="pt-3"><code>r!streamnotifs usernames</code> - View all users added to the currently selected stream notification channel.</p>
+        <p><code>r!streamnotifs keywords</code> - View a list of keyword filters on the currently select stream notification channel.</p>
+
+        <p class="pt-3"><code>r!streamnotifs user add (keyword)</code> - Add a user to receive notifications for (on the currently selected channel).</p>
+        <p><code>r!streamnotifs user remove (keyword)</code> - Remove a user from the stream notifications for the currently selected channel.</p>
+
+        <p class="pt-3"><code>r!streamnotifs subreddit add (subreddit)</code> - Add a subreddit to the stream notifications requirement for this setting. Only streams broadcasted to these subreddits will be alerted.</p>
+        <p><code>r!streamnotifs subreddit remove (subreddit)</code> - Remove a subreddit from the channel filter.</p>
+
+        <p class="pt-3"><code>r!streamnotifs keyword add (keyword)</code> - Add a keyword filter for the current channel. <span class="text-muted">(This is a word or phrase that is required in the title for a notification to be sent.)</span></p>
+        <p><code>r!streamnotifs keyword remove (keyword)</code> - Remove a keyword filter from the currently selected channel.</p>
+
+        <p class="pt-3"><code>r!streamnotifs settext (text)</code> - Set some text that is sent with the stream notifications. Mentions can be included in this.</p>
+
+        <p class="pt-3"><code>r!streamnotifs delete (channel/id)</code> - Delete a stream notification channel from the settings.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--
+  You've found an easter egg :)
+  🥔 was here
+-->
+{% endblock %}

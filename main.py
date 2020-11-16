@@ -19,7 +19,11 @@ from pathlib import Path
 from pygount import ProjectSummary, SourceAnalysis
 
 from utils.settings import Settings
+from utils.sentry import start_sentry
 from utils.reddit import RedditInstance
+from utils.strapi_wrapper import StrapiInstance
+from utils.rpan_subreddits import RPANSubreddits
+from utils.database.handler import DatabaseHandler
 
 from discord.bot import RPANBot
 from web.quart import create_app
@@ -29,31 +33,42 @@ class RPANBotCore:
     def __init__(self) -> None:
         # Load the settings.
         self.settings = Settings(file_path=Path(__file__).parent.absolute())
-
-        # Initiate the Reddit, bot and web instances.
-        self.reddit = RedditInstance(settings=self.settings)
-        self.web = create_app(core=self)
-        self.bot = RPANBot(core=self)
+        self.rpan_subreddits = RPANSubreddits()
 
         # Calculate the lines of code.
         self.calculate_loc()
 
+        # Load the Sentry error tracking module.
+        self.sentry = None
+        if self.settings.links.sentry:
+            self.sentry = start_sentry(link=self.settings.links.sentry)
+
+        # Load the database handler.
+        self.db_handler = DatabaseHandler(settings=self.settings)
+
+        # Initiate PRAW and the custom strapi wrapper.
+        self.reddit = RedditInstance(core=self)
+        self.strapi = StrapiInstance(core=self)
+
+        # Initiate the web and bot instances.
+        self.web = create_app(core=self)
+        self.bot = RPANBot(core=self)
+
         # Start the bot.
-        self.start_web()
         self.bot.start_bot()
 
-    def start_web(self) -> None:
+    async def handle_web(self) -> None:
         """
         Creates the Quart task on the Discord bot event loop.
         """
-        self.bot.loop.create_task(self.web.run_task(host="0.0.0.0", port=5050, use_reloader=False))
+        await self.web.run_task(host="0.0.0.0", port=5050, use_reloader=False)
 
     def calculate_loc(self) -> None:
         """
         Calculates the number of lines of code that the bot uses.
         """
         project_summary = ProjectSummary()
-        for source_path in glob("**/*.py", recursive=True):
+        for source_path in glob("**/*.py", recursive=True) + glob("**/*.html", recursive=True):
             source_analysis = SourceAnalysis.from_file(source_path, "pygount", encoding="utf-8", fallback_encoding="cp850")
             project_summary.add(source_analysis)
 

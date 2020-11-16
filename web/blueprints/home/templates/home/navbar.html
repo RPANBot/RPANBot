@@ -8,6 +8,7 @@
     <ul class="navbar-nav mr-auto">
       <li class="nav-item{% if request.url_rule.endpoint == 'home.main' %} active{% endif %}"><a class="nav-link" href="{{ url_for('home.main') }}">Home</a></li>
       <li class="nav-item{% if request.url_rule.endpoint == 'home.features' %} active{% endif %}"><a class="nav-link" href="{{ url_for('home.features') }}">Features</a></li>
+      <li class="nav-item{% if request.url_rule.endpoint == 'home.commands' %} active{% endif %}"><a class="nav-link" href="{{ url_for('home.commands') }}">Commands</a></li>
       <li class="nav-item"><a class="nav-link" href="{{ invite_link }}">Invite</a></li>
       <li class="nav-item"><a class="nav-link" href="{{ support_invite }}">Support</a></li>
     </ul>

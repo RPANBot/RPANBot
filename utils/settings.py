@@ -31,7 +31,6 @@ class RPANBotSettings:
         config_path = file_path / "configs/"
         self.load_configs(config_path=config_path)
         self.load_environments(config_path=config_path)
-        self.parse_config()
 
         # Load the subclasses.
         self.ids = self.IDs(self)
@@ -40,6 +39,7 @@ class RPANBotSettings:
         self.web = self.Web(self)
         self.reddit = self.Reddit(self)
         self.discord = self.Discord(self)
+
         self.database = self.Database(self)
 
         print("Succesfully loaded the settings.")
@@ -83,6 +83,10 @@ class RPANBotSettings:
         @property
         def host(self) -> str:
             return self.parent.config["database"]["host"]
+
+        @property
+        def port(self) -> int:
+            return self.parent.config["database"]["port"]
 
         @property
         def db(self) -> str:
@@ -129,10 +133,6 @@ class RPANBotSettings:
             return self.parent.config["rpan_guilds"]
 
         @property
-        def support_guilds(self) -> list:
-            return self.parent.config["bot_support_guilds"]
-
-        @property
         def bot_developers(self) -> list:
             return self.parent.config["bot_developer_ids"]
 
@@ -156,6 +156,14 @@ class RPANBotSettings:
         def denied_bugs_channel(self) -> int:
             return self.parent.config["channels"]["bugs"]["denied"]
 
+        @property
+        def contact_channel(self) -> int:
+            return self.parent.config["channels"]["developer"]["contact"]
+
+        @property
+        def exclusions_and_spam_channel(self) -> int:
+            return self.parent.config["channels"]["developer"]["exclusions_and_spam"]
+
     class Links:
         def __init__(self, parent) -> None:
             self.parent = parent
@@ -173,8 +181,8 @@ class RPANBotSettings:
             self.invite_permissions = 537095232
 
         @property
-        def default_prefix(self) -> str:
-            return getenv("BOT_PREFIX")
+        def default_prefixes(self) -> list:
+            return self.parent.config["default_prefixes"]
 
         @property
         def client_id(self) -> id:
@@ -187,64 +195,6 @@ class RPANBotSettings:
         @property
         def token(self) -> str:
             return getenv("DISCORD_TOKEN")
-
-    def parse_config(self) -> None:
-        """
-        Parses the config.
-        """
-        self.config["rpan_subreddits"]["list"] = list(
-            set(
-                [
-                    subreddit.lower()
-                    for subreddit in self.config["rpan_subreddits"]["list"]
-                ] + [
-                    "pan",
-                    "animalsonreddit",
-                    "distantsocializing",
-                    "glamourschool",
-                    "headlineworthy",
-                    "readwithme",
-                    "redditinthekitchen",
-                    "redditmasterclasses",
-                    "redditsessions",
-                    "shortcircuit",
-                    "tabletoplive",
-                    "talentshow",
-                    "theartiststudio",
-                    "thegamerlounge",
-                    "theyoushow",
-                    "whereintheworld"
-                ]
-            )
-        )
-
-        self.config["rpan_subreddits"]["abbreviations"] = {
-            abbreviation.lower(): subreddit.lower()
-            for abbreviation, subreddit in self.config["rpan_subreddits"]["abbreviations"].items()
-        }
-
-        self.config["rpan_subreddits"]["abbreviations"].update({
-            "aor": "animalsonreddit",
-            "ds": "distantsocializing",
-            "gs": "glamourschool",
-            "hw": "headlineworthy",
-            "rwm": "readwithme",
-            "ritk": "redditinthekitchen",
-            "rmc": "redditmasterclasses",
-            "rs": "redditsessions",
-            "sc": "shortcircuit",
-            "ttl": "tabletoplive",
-            "ts": "talentshow",
-            "tas": "theartiststudio",
-            "tgl": "thegamerlounge",
-            "tys": "theyoushow",
-            "witw": "whereintheworld"
-        })
-
-        self.config["mqmm_notifications"] = {
-            subreddit.lower(): channel_id
-            for subreddit, channel_id in self.config["mqmm_notifications"].items()
-        }
 
 
 loaded_instance = None

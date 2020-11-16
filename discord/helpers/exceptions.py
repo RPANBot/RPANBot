@@ -13,21 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from discord import CategoryChannel, TextChannel
+from discord.ext.commands import CheckFailure
 
 
-from web.helpers.classes import Guild
+class DeveloperCheckFailure(CheckFailure):
+    """
+    This exception is raised when a non-developer attempts to perform a developer-only action.
+    """
+    pass
 
 
-def get_guild_icon(guild: Guild, size: int = 128, format: str = "jpg") -> str:
-    if not guild.icon:
-        return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png"
-    return f"https://cdn.discordapp.com/icons/{guild.id}/{guild.icon}.{format}?size={size}"
-
-
-def is_text_channel(channel) -> bool:
-    return isinstance(channel, TextChannel)
-
-
-def is_category_channel(channel) -> bool:
-    return isinstance(channel, CategoryChannel)
+class ExcludedUserBlocked(CheckFailure):
+    """
+    This exception is raised when an excluded user attempts to use a command.
+    """
+    pass

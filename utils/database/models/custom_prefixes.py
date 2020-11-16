@@ -13,21 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from discord import CategoryChannel, TextChannel
+from sqlalchemy import Column, BigInteger, Integer
+
+from utils.database.decorators import JsonDecorator
+
+from utils.database.models.base import Base
 
 
-from web.helpers.classes import Guild
+class CustomPrefixes(Base):
+    __tablename__ = "custom_prefixes"
 
+    id = Column(Integer, primary_key=True)
+    guild_id = Column(BigInteger, unique=True)
+    prefixes = Column(JsonDecorator)
 
-def get_guild_icon(guild: Guild, size: int = 128, format: str = "jpg") -> str:
-    if not guild.icon:
-        return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png"
-    return f"https://cdn.discordapp.com/icons/{guild.id}/{guild.icon}.{format}?size={size}"
-
-
-def is_text_channel(channel) -> bool:
-    return isinstance(channel, TextChannel)
-
-
-def is_category_channel(channel) -> bool:
-    return isinstance(channel, CategoryChannel)
+    def __repr__(self):
+        return f"CustomPrefixes({self.guild_id})"

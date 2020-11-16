@@ -1,0 +1,21 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="card bg-dark">
+    <div class="row no-gutters">
+      <div class="col-md-4"><img class="card-img img-fluid" src="{{ get_guild_icon(guild, size=512) }}"></div>
+      <div class="col-md-8">
+        <div class="card-body">
+        <h1>{{ guild.name }}</h1>
+        <h5 class="text-muted">ID: {{ guild.id }}</h5>
+
+        <div style="position: absolute; bottom: 1rem;" class="mt-5">
+          <a class="btn btn-outline-teal" href="{{ url_for('dashboard.guild_general', id=guild.id) }}">General Settings</a>
+          <a class="btn btn-outline-blue ml-2" href="{{ url_for('dashboard.guild_notifications', id=guild.id) }}">Stream Notification Settings</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

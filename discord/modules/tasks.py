@@ -13,21 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from discord import CategoryChannel, TextChannel
+from discord.ext.commands import Cog
+from discord.ext.tasks import loop
 
 
-from web.helpers.classes import Guild
+class Tasks(Cog):
+    def __init__(self, bot) -> None:
+        self.bot = bot
 
+        self.web_task.start()
 
-def get_guild_icon(guild: Guild, size: int = 128, format: str = "jpg") -> str:
-    if not guild.icon:
-        return "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png"
-    return f"https://cdn.discordapp.com/icons/{guild.id}/{guild.icon}.{format}?size={size}"
+    def cog_unload(self) -> None:
+        self.web_task.cancel()
 
+    @loop()
+    async def web_task(self) -> None:
+        await self.bot.core.handle_web()
 
-def is_text_channel(channel) -> bool:
-    return isinstance(channel, TextChannel)
+    @web_task.before_loop
+    async def before_web_task(self) -> None:
+        await self.bot.wait_until_ready()
 
-
-def is_category_channel(channel) -> bool:
-    return isinstance(channel, CategoryChannel)
+def setup(bot) -> None:
+    bot.add_cog(Tasks(bot))

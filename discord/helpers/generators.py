@@ -90,4 +90,4 @@ class RPANEmbed(Embed):
                 self.set_footer(text=footer_text)
         else:
             if message:
-                self.set_footer(text="More Info: rpanbot.botcavern.xyz")
+                self.set_footer(text="rpanbot.botcavern.xyz")

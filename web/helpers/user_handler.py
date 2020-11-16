@@ -90,7 +90,7 @@ class UserHandler:
 
     def get_bot_invite(self) -> str:
         if self.get_user().is_real:
-            # TODO: Call back to refesh guild list.
+            # TODO: Callback to refesh guild list.
             return "https://discord.com/oauth2/authorize?client_id={client_id}&scope=bot&permissions={invite_permissions}".format(
                 client_id=self.app.core.settings.discord.client_id,
                 invite_permissions=self.app.core.settings.discord.invite_permissions,

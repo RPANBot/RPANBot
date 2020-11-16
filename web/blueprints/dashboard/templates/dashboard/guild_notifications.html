@@ -1,0 +1,53 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="card bg-dark">
+    <div class="card-header">{{ guild.name }}</div>
+    <div class="card-body">
+      <a class="btn btn-outline-teal" href="{{ url_for('dashboard.guild_general', id=guild.id) }}">General Settings</a>
+      <a class="btn btn-blue ml-2" href="{{ url_for('dashboard.guild_notifications', id=guild.id) }}">Stream Notification Settings</a>
+    </div>
+  </div>
+
+  <div class="card bg-dark mt-4">
+    <div class="card-header">Stream Notification Settings</div>
+    <div class="card-body">
+      <p>Stream notifications allow you to receive a message to certain channels when certain users go live.</p>
+      <p>To get started, select a channel and hit the setup button. This will bring you to the settings page for that channel.</p>
+
+      <form>
+        <div class="form-row">
+          <div class="col">
+            <select class="form-control">
+              <option class="text-muted bg-dark">Select Channel</option>
+              {% for channel in channels %}
+                {% if channel | is_category_channel %}
+                <option class="text-grey" style="background-color: #000;" disabled>{{ channel.name }}</option>
+                {% elif channel | is_text_channel %}
+                <option class="text-white bg-dark" value="{{ channel.id }}">#{{ channel.name }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col"><button type="button" class="btn btn-primary">Setup</button></div>
+
+          <div class="col">
+            <select class="form-control">
+              <option>Select Channel</option>
+              <option>#general</option>
+            </select>
+          </div>
+          <div class="col"><button type="button" class="btn btn-primary">Select</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card bg-dark mt-4">
+    <div class="card-header">Selected Setting</div>
+    <div class="card-body">
+      <p>Currently selected.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
