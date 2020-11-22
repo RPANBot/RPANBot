@@ -55,7 +55,7 @@ class BNSettingsHandler:
         if channel_id is not None:
             return self.bot.db_session.query(BNSetting).filter_by(guild_id=guild_id, channel_id=channel_id)
         else:
-            return self.bot.db_session.query(BNSetting).filter_by(guild_id=guild_id)
+            return self.bot.db_session.query(BNSetting).filter_by(guild_id=guild_id).order_by(BNSetting.id)
 
     def get_setting(self, guild_id: int, channel_id: int) -> Union[None, BNSetting]:
         """

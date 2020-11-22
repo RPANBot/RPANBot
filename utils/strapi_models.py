@@ -41,7 +41,8 @@ class Broadcast:
             self.is_live = False
 
         if payload.get("source", None) == "strapi":
-            self.published_at = int(self.published_at) / 1000
+            if self.publish_at:
+                self.published_at = int(self.published_at) / 1000
 
             self.global_rank = payload["global_rank"]
             self.total_streams = payload["total_streams"]

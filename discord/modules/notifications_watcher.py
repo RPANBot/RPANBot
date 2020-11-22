@@ -42,36 +42,38 @@ class NotificationsWatcher(Cog):
 
     def send_broadcast_notification(self, setting: BNSetting, broadcast) -> None:
         escaped_username = escape_username(broadcast.author_name)
-        data = dumps({
-            "username": "RPANBot",
-            "avatar_url": self.bot.core.settings.links.bot_avatar,
-            "content": ("" if not setting.custom_text else setting.custom_text),
-            "embeds": [
+
+        embed = {
+            "title": f"u/{escaped_username} started streaming!",
+            "url": broadcast.url,
+            "color": 26763,
+            "fields": [
                 {
-                    "title": f"u/{escaped_username} started streaming!",
-                    "url": broadcast.url,
-                    "color": 26763,
-                    "fields": [
-                        {
-                            "name": "Title",
-                            "value": broadcast.title,
-                            "inline": True,
-                        },
-                        {
-                            "name": "Subreddit",
-                            "value": f"r/{broadcast.subreddit_name}",
-                            "inline": True,
-                        }
-                    ],
-                    "footer": {
-                        "text": f"Started: {format_timestamp(broadcast.published_at)}",
-                    },
-                    "thumbnail": {
-                        "url": broadcast.thumbnail,
-                    },
+                    "name": "Title",
+                    "value": broadcast.title,
+                    "inline": True,
                 },
+                {
+                    "name": "Subreddit",
+                    "value": f"r/{broadcast.subreddit_name}",
+                    "inline": True,
+                }
             ],
-        })
+            "footer": {},
+            "thumbnail": {"url": broadcast.thumbnail}
+        }
+
+        if broadcast.published_at:
+            embed["footer"]["text"] = f"Started: {format_timestamp(broadcast.published_at)}"
+
+        data = dumps(
+            {
+                "username": "RPANBot",
+                "avatar_url": self.bot.core.settings.links.bot_avatar,
+                "content": ("" if not setting.custom_text else setting.custom_text),
+                "embeds": [embed],
+            }
+        )
 
         request = post(
             setting.webhook_url,

@@ -196,12 +196,12 @@ async def guild_notifications(id: int):
         channels = current_app.core.bot.get_guild(guild.id).channels
 
         notif_channels = {}
-        for i, setting in enumerate(current_app.db_session.query(BNSetting).filter_by(guild_id=id).all()):
-            setting_channel = current_app.core.bot.get_channel(setting.channel_id)
+        for i, setting in enumerate(current_app.db_session.query(BNSetting).filter_by(guild_id=id).order_by(BNSetting.id).all()):
+            listing_channel = current_app.core.bot.get_channel(setting.channel_id)
             if setting_channel:
-                notif_channels[f"#{setting_channel.name} (#{i + 1})"] = setting
+                notif_channels[f"#{listing_channel.name} (#{i + 1})"] = setting
             else:
-                notif_channels[f"Unkown (#{i + 1})"] = setting
+                notif_channels[f"Unknown (#{i + 1})"] = setting
 
         return await render_template(
             "dashboard/guild_notifications.html",

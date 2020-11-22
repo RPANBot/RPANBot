@@ -11,6 +11,7 @@
 
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/cookiealert.min.css') }}" rel="stylesheet">
   </head>
   <body>
     {% include 'dashboard/navbar.html' %}
@@ -24,8 +25,15 @@
       </div>
     </div>
 
+    <div class="alert text-center cookiealert" role="alert">
+      <span class="mr-5">&#x1F36A; Cookies are required for the functionality of the dashboard.</span>
+      <a href="https://cookiesandyou.com/" target="_blank">Learn More</a>
+      <button type="button" class="btn btn-primary btn-sm acceptcookies">Accept</button>
+    </div>
+
     <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cookiealert.min.js') }}"></script>
     <script src="//instant.page/5.1.0" type="module" integrity="sha384-by67kQnR+pyfy8yWP4kPO12fHKRLHZPfEsiSXR8u2IKcTdxD805MGUXBzVPnkLHw"></script>
   </body>
 </html>
