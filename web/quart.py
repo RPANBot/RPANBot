@@ -34,6 +34,8 @@ def create_app(core) -> Quart:
     app.config.update(core.settings.web.config)
     if core.settings.web.config["DEBUG"]:
         environ["OAUTHLIB_INSECURE_TRANSPORT"] = "true"
+    elif core.settings.web.config["INSECURE_TRANSPORT"]:
+        environ["OAUTHLIB_INSECURE_TRANSPORT"] = "true"
 
     UserHandler(app)
 
