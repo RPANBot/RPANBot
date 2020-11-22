@@ -27,7 +27,7 @@ from requests import post
 from utils.database.models.testing import BNTestingDataset
 from utils.database.models.broadcast_notifications import BNSetting, BNUser
 
-from discord.helpers.utils import escape_username, is_rpan_broadcast
+from discord.helpers.utils import escape_username, is_rpan_broadcast, format_timestamp
 
 
 class NotificationsWatcher(Cog):
@@ -64,7 +64,7 @@ class NotificationsWatcher(Cog):
                         }
                     ],
                     "footer": {
-                        "text": f"Started: {broadcast.published_at.strftime('%d/%m/%Y at %H:%M UTC')}",
+                        "text": f"Started: {format_timestamp(broadcast.published_at)}",
                     },
                     "thumbnail": {
                         "url": broadcast.thumbnail,
@@ -104,12 +104,16 @@ class NotificationsWatcher(Cog):
                     author = submission.author.name.lower()
 
                     # Fetch the settings for this user (if any).
-                    notifications_for = [user.notifications_for for user in db_session.query(BNUser).filter_by(username=author).all()]
+                    notifications_for = []
+                    result = db_session.query(BNUser).filter_by(username=author).first()
+                    if result:
+                        for notif_setting in result.notifications_for.all():
+                            notifications_for.append(notif_setting)
 
                     # Check if the user is in the broadcast notifications testing dataset.
                     # If they are then send a notification to all channels with 'rpanbot' added.
                     if db_session.query(BNTestingDataset).filter_by(username=author).first():
-                        result = [user.notifications_for for user in db_session.query(BNUser).filter_by(username="rpanbot").all()]
+                        result = [user.notifications_for.all for user in db_session.query(BNUser).filter_by(username="rpanbot").all()]
                         for notif_setting in result:
                             notifications_for.append(notif_setting)
 
@@ -133,7 +137,7 @@ class NotificationsWatcher(Cog):
                         # Check that the broadcast is in an accepted subreddit (if there are subreddit_filters).
                         if setting.subreddit_filters:
                             subreddit = submission.subreddit.display_name.lower()
-                            if not any(sub_req != subreddit for sub_req in setting.subreddit_filters):
+                            if subreddit not in setting.subreddit_filters:
                                 continue
 
                         # Send a notification.

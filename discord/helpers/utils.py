@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from re import sub
+from datetime import datetime, timezone
 
 
 def is_rpan_broadcast(link: str) -> bool:
@@ -39,4 +40,18 @@ def parse_link(link: str) -> str:
 
 
 def escape_username(name: str) -> str:
+    """
+    Escapes markdown in a username.
+    :return: The username with prevented italics.
+    """
     return name.replace("_", "\\_")
+
+
+def format_timestamp(timestamp: float) -> str:
+    """
+    Formats a timestamp.
+    :param timestamp: The timestamp to format.
+    :return: Returns a time in a set format.
+    """
+    time = datetime.fromtimestamp(int(timestamp), tz=timezone.utc)
+    return time.strftime("%d/%m/%Y at %H:%M UTC")
