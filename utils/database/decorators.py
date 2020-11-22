@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from sqlalchemy import TypeDecorator, String
+from sqlalchemy.ext.mutable import MutableList
 
 from json import loads, dumps
 
@@ -25,4 +26,9 @@ class JsonDecorator(TypeDecorator):
         return dumps(value)
 
     def process_result_value(self, value, dialect):
+        if value is None:
+            return []
         return loads(value)
+
+
+MutableList.associate_with(JsonDecorator)

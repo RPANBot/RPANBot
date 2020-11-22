@@ -100,6 +100,10 @@ class RPANBot(Bot):
         prefixes_to_use = self.get_prefixes(message.guild)
         return when_mentioned_or(*prefixes_to_use)(self, message)
 
+    def get_primary_prefix(self, guild: Guild) -> str:
+        prefixes = self.get_prefixes(guild)
+        return prefixes[0]
+
     def is_excluded_user(self, user_id: int) -> bool:
         """
         Checks if a user is excluded from using the bot.
@@ -137,7 +141,10 @@ class RPANBot(Bot):
         """
         channel = self.get_channel(id)
         if channel is None:
-            channel = await self.fetch_channel(id)
+            try:
+                channel = await self.fetch_channel(id)
+            except Exception:
+                pass
         return channel
 
     def start_bot(self) -> None:

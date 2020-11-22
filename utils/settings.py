@@ -178,7 +178,7 @@ class RPANBotSettings:
     class Discord:
         def __init__(self, parent) -> None:
             self.parent = parent
-            self.invite_permissions = 537095232
+            self.invite_permissions = 536955968
 
         @property
         def default_prefixes(self) -> list:

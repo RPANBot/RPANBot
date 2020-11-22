@@ -27,7 +27,7 @@ from requests import post
 from utils.database.models.testing import BNTestingDataset
 from utils.database.models.broadcast_notifications import BNSetting, BNUser
 
-from discord.helpers.utils import is_rpan_broadcast
+from discord.helpers.utils import escape_username, is_rpan_broadcast
 
 
 class NotificationsWatcher(Cog):
@@ -37,19 +37,18 @@ class NotificationsWatcher(Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
 
-        print(self.bot.db_session.query(BNTestingDataset).all())
-
         self.submissions_stream = Thread(target=self.watch_submissions)
         self.submissions_stream.start()
 
     def send_broadcast_notification(self, setting: BNSetting, broadcast) -> None:
+        escaped_username = escape_username(broadcast.author_name)
         data = dumps({
             "username": "RPANBot",
             "avatar_url": self.bot.core.settings.links.bot_avatar,
             "content": ("" if not setting.custom_text else setting.custom_text),
             "embeds": [
                 {
-                    "title": f"u/{broadcast.author_name} started streaming!",
+                    "title": f"u/{escaped_username} started streaming!",
                     "url": broadcast.url,
                     "color": 26763,
                     "fields": [

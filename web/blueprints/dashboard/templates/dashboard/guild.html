@@ -7,7 +7,7 @@
       <div class="col-md-8">
         <div class="card-body">
         <h1>{{ guild.name }}</h1>
-        <h5 class="text-muted">ID: {{ guild.id }}</h5>
+        <h5 class="text-muted mb-5">ID: {{ guild.id }}</h5>
 
         <div style="position: absolute; bottom: 1rem;" class="mt-5">
           <a class="btn btn-outline-teal" href="{{ url_for('dashboard.guild_general', id=guild.id) }}">General Settings</a>

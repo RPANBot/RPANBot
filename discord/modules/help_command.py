@@ -155,6 +155,7 @@ class RPANBotHelpCommand(HelpCommand):
 
                 **Info**
                 Type ``{self.clean_prefix}{group.name} (command)`` to use a command listed here.
+                Use ``{self.clean_prefix}help {group.name} (command)`` to get more info on commands here.
                 [Click here to view a more in-depth description of the commands.](https://rpanbot.botcavern.xyz/commands)
 
                 **Argument Key**
@@ -219,7 +220,7 @@ class RPANBotHelpCommand(HelpCommand):
     async def send_help_message(self, channel, text: str, embed: RPANEmbed) -> None:
         if not isinstance(channel, DMChannel):
             if not channel.guild.me.guild_permissions.embed_links:
-                await channel.send("RPANBot requires the 'Embed Links' permission for most of its commands (including the help menu).")
+                await channel.send("**RPANBot requires the 'Embed Links' permission** for most of its commands (including the help menu).")
                 return
 
         await channel.send(

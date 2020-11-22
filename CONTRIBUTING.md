@@ -18,7 +18,7 @@ We have a channel to discuss the bot's development in the [Discord guild.](https
 
 * Open a pull request with your branch.
 
-* Include a description of the new feature/changes.
+* Include a description of the new feature(s)/change(s).
 
 ---
 

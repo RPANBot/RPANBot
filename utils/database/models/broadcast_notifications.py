@@ -30,7 +30,7 @@ class BNUser(Base):
     notifications_for = relationship("BNSetting", secondary="bn_mapped_users", back_populates="users", lazy="dynamic")
 
     def __repr__(self):
-        return f"BNUser({self.id}, {self.user_id})"
+        return f"BNUser({self.id}, {self.username})"
 
 
 class BNSetting(Base):

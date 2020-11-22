@@ -57,6 +57,9 @@ class UserHandler:
         guilds_payload = discord.get("https://discord.com/api/users/@me/guilds").json()
 
         user_id = int(user_payload["id"])
+        if self.app.core.bot.is_excluded_user(user_id):
+            return redirect(url_for("home.main"))
+
         self.authed_users[user_id] = User(user_payload, guilds_payload)
 
         session["DISCORD_ID"] = user_id
@@ -73,10 +76,10 @@ class UserHandler:
         if user_id is None:
             if session.get("DISCORD_ID") in self.authed_users.keys():
                 del self.authed_users[session["DISCORD_ID"]]
-            del session["DISCORD_ID"]
-            del session["DISCORD_TOKEN"]
+            session.pop("DISCORD_ID", None)
+            session.pop("DISCORD_TOKEN", None)
         else:
-            del self.authed_users[user_id]
+            self.authed_users.pop(user_id, None)
 
     def get_user(self) -> Union[User, UnauthedUser]:
         user_id = session.get("DISCORD_ID")

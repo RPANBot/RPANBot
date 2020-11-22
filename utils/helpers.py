@@ -28,3 +28,11 @@ def erase_guild_settings(session, id: int) -> None:
         session.delete(custom_prefixes)
 
     session.commit()
+
+
+def to_lowercase(text: str) -> str:
+    return text.lower()
+
+
+def parse_reddit_username(name: str) -> str:
+    return name.lower().replace("/u/", "").replace("u/", "")

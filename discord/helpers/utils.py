@@ -36,3 +36,7 @@ def parse_link(link: str) -> str:
         .replace("redd.it/", "")
     )
     return sub("(rpan/r|r)/(.*?)/(comments/)?", "", id).split("/")[0].split("?")[0]
+
+
+def escape_username(name: str) -> str:
+    return name.replace("_", "\\_")

@@ -16,18 +16,20 @@ limitations under the License.
 from discord import Guild, Member, Message
 from discord.ext.commands import (
     Cog,
-    BotMissingPermissions, CommandNotFound, CheckFailure, MissingRequiredArgument, MissingPermissions,
+    BadArgument, BotMissingPermissions, CommandNotFound, CheckFailure, MissingRequiredArgument, MissingPermissions,
     BucketType, CooldownMapping
 )
 
 from textwrap import dedent
+
+from datetime import timezone
 
 from utils.helpers import erase_guild_settings
 from utils.database.models.exclusions import ExcludedGuild, ExcludedUser
 
 from discord.helpers.generators import RPANEmbed
 from discord.helpers.checks import is_not_excluded
-from discord.helpers.exceptions import DeveloperCheckFailure, ExcludedUserBlocked
+from discord.helpers.exceptions import DeveloperCheckFailure, ExcludedUserBlocked, GlobalCooldownFailure
 
 
 class Events(Cog):
@@ -41,7 +43,8 @@ class Events(Cog):
         self.bot.check(is_not_excluded)
         self.bot.before_invoke(self.before_invoke)
 
-        self.spam_cooldown = CooldownMapping.from_cooldown(rate=10, per=15.0, type=BucketType.user)
+        self.spam_counter = {}
+        self.spam_cooldown = CooldownMapping.from_cooldown(rate=10, per=7.5, type=BucketType.user)
 
         self.exclusion_watch = None
 
@@ -69,6 +72,66 @@ class Events(Cog):
             await message.channel.send(f"Hello {message.author.mention}! I respond to the following prefixes here:\n{prefixes}")
 
     async def before_invoke(self, ctx):
+        """
+        Handles some events before continuing with invoking a command.
+        """
+        # Handle the global commands cooldown.
+        cooldown_bucket = self.spam_cooldown.get_bucket(ctx.message)
+        cooldown_retry = cooldown_bucket.update_rate_limit(ctx.message.created_at.replace(tzinfo=timezone.utc).timestamp())
+        if cooldown_retry:
+            # Increment the user's spam counter.
+            if ctx.author.id in self.spam_counter:
+                self.spam_counter[ctx.author.id] += 1
+            else:
+                self.spam_counter[ctx.author.id] = 1
+
+            # Load the spam log channel.
+            log_channel = await self.bot.find_channel(self.bot.core.settings.ids.exclusions_and_spam_channel)
+
+            # Check if the user has been continually spamming.
+            if self.spam_counter[ctx.author.id] >= 5:
+                self.bot.db_session.add(ExcludedUser(user_id=ctx.author.id))
+                self.bot.db_session.commit()
+                del self.bot.excluded_user_cache[ctx.author.id]
+                del self.spam_counter[ctx.author.id]
+
+                await log_channel.send(
+                    "",
+                    embed=RPANEmbed(
+                        title="Auto Ban Issued",
+                        description="A user has been banned due to the amount of cooldowns they've received.",
+                        colour=0x800000,
+
+                        fields={
+                            "User": f"{ctx.author} ({ctx.author.id})",
+                            "Guild": f"{ctx.guild.name} ({ctx.guild.id})",
+                            "Guild Owner": f"{ctx.guild.owner}\n({ctx.guild.owner_id})",
+                        },
+                    ),
+                )
+            else:
+                await log_channel.send(
+                    "",
+                    embed=RPANEmbed(
+                        title="Spam Note",
+                        description="A user has been marked as spamming.",
+                        colour=0xFFFF00,
+
+                        fields={
+                            "User": f"{ctx.author} ({ctx.author.id})",
+                            "Guild": f"{ctx.guild.name} ({ctx.guild.id})",
+                            "Guild Owner": f"{ctx.guild.owner}\n({ctx.guild.owner_id})",
+                        },
+                    ),
+                )
+
+            # Raise the exception that the user is on cooldown.
+            raise GlobalCooldownFailure
+        else:
+            if ctx.author.id in self.spam_counter:
+                self.spam_counter[ctx.author.id]
+
+        # Start typing before executing the command.
         await ctx.trigger_typing()
 
     @Cog.listener()
@@ -179,8 +242,8 @@ class Events(Cog):
         # Log the exception if it isn't in the exclusion list.
         print(error)
         if self.bot.core.sentry:
-            exclusion_list = [BotMissingPermissions, CheckFailure, ExcludedUserBlocked, MissingPermissions, MissingRequiredArgument]
-            if error not in exclusion_list:
+            exclusion_list = [BadArgument, BotMissingPermissions, CheckFailure, ExcludedUserBlocked, MissingPermissions, MissingRequiredArgument, GlobalCooldownFailure]
+            if not any([isinstance(error, excluded_error) for excluded_error in exclusion_list]):
                 self.bot.core.sentry.capture_exception(error)
 
         # Return if there is already an error handler for this command.
@@ -189,7 +252,7 @@ class Events(Cog):
             return
 
         # Don't send error messages for some exceptions.
-        if isinstance(error, ExcludedUserBlocked):
+        if isinstance(error, ExcludedUserBlocked) or isinstance(error, GlobalCooldownFailure):
             return
 
         # Send an error message to other exceptions.
@@ -237,6 +300,15 @@ class Events(Cog):
                 embed=RPANEmbed(
                     title="Insufficient Permissions",
                     description="This command cannot run here.",
+                    colour=0x8B0000,
+                ),
+            )
+        elif isinstance(error, BadArgument):
+            await ctx.send(
+                "",
+                embed=RPANEmbed(
+                    title="You've input something wrong.",
+                    description=f"The following argument was input incorrectly: '{error.param}'",
                     colour=0x8B0000,
                 ),
             )

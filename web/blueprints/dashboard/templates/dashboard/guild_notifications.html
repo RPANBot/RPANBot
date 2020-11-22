@@ -15,39 +15,268 @@
       <p>Stream notifications allow you to receive a message to certain channels when certain users go live.</p>
       <p>To get started, select a channel and hit the setup button. This will bring you to the settings page for that channel.</p>
 
-      <form>
-        <div class="form-row">
-          <div class="col">
-            <select class="form-control">
-              <option class="text-muted bg-dark">Select Channel</option>
-              {% for channel in channels %}
-                {% if channel | is_category_channel %}
-                <option class="text-grey" style="background-color: #000;" disabled>{{ channel.name }}</option>
-                {% elif channel | is_text_channel %}
-                <option class="text-white bg-dark" value="{{ channel.id }}">#{{ channel.name }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
+      <form action="{{ url_for('dashboard.guild_notifications_submit', id=guild.id) }}" method="POST">
+        <div class="row">
+          <div class="col-12 col-md-6">
+            <div class="form-row mt-3">
+              <div class="col">
+                <select class="form-control" name="setup_channel">
+                  <option class="text-muted bg-dark">Select Setup Channel</option>
+                  {% for channel in channels %}
+                    {% if channel | is_category_channel %}
+                    <option class="text-grey" style="background-color: #000;" disabled>{{ channel.name }}</option>
+                    {% elif channel | is_text_channel %}
+                    <option class="text-white bg-dark" value="{{ channel.id }}">#{{ channel.name }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col"><button type="submit" class="btn btn-primary" name="setup">Setup</button></div>
+            </div>
           </div>
-          <div class="col"><button type="button" class="btn btn-primary">Setup</button></div>
 
-          <div class="col">
-            <select class="form-control">
-              <option>Select Channel</option>
-              <option>#general</option>
-            </select>
+          <div class="col-12 col-md-6">
+            <div class="form-row mt-3">
+              <div class="col">
+                <select class="form-control" name="select_channel">
+                  <option>Select Notification Setting</option>
+                  {% if notif_channels %}
+                  {% for channel, setting in notif_channels.items() %}
+                    <option value="{{ setting.channel_id }}">{{ channel }}</option>
+                  {% endfor %}
+                  {% else %}
+                  <option>None</option>
+                  {% endif %}
+                </select>
+              </div>
+              <div class="col"><button type="submit" class="btn btn-primary" name="select">Select</button></div>
+            </div>
           </div>
-          <div class="col"><button type="button" class="btn btn-primary">Select</button></div>
         </div>
       </form>
     </div>
   </div>
 
+  {% with alerts = get_flashed_messages(with_categories=true) %}
+  {% if selected_setting or alerts %}
   <div class="card bg-dark mt-4">
     <div class="card-header">Selected Setting</div>
     <div class="card-body">
-      <p>Currently selected.</p>
+      {% if alerts %}{% for category, message in alerts %}<div class="alert alert-{{ category }} alert-dismissible" role="alert">{{ message }}</div>{% endfor %}{% endif %}
+      {% if selected_setting %}
+      <h4>Currently selected: <span class="text-blue">#{{ selected_setting_channel.name }}</span> <span class="text-muted">({{ selected_setting.channel_id }})</span></h4>
+
+      <form action="{{ url_for('dashboard.guild_notifications_setting_submit', id=guild.id, setting_id=selected_setting.channel_id) }}" method="POST">
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Added Users</h6>
+          </div>
+          <div class="col-12 col-lg-10">
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">Username</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if selected_setting.users.count() %}
+                {% for user in selected_setting.users %}
+                <tr>
+                  <td><a href="https://reddit.com/user/{{ user.username }}">u/{{ user.username }}</a></td>
+                  <td><button type="submit" class="btn btn-secondary" name="remove_user" value="{{ user.username }}">Remove</button></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td>Add users below.</td>
+                  <td>#</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Keyword Filters</h6>
+          </div>
+          <div class="col-12 col-lg-10">
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">Demo</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if selected_setting.keyword_filters %}
+                {% for keyword in selected_setting.keyword_filters %}
+                <tr>
+                  <td>{{ keyword }}</td>
+                  <td><button type="submit" class="btn btn-secondary" name="remove_keyword" value="{{ loop.index0 }}">Remove</button></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td>Add filters below.</td>
+                  <td>#</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Subreddit Filters</h6>
+          </div>
+          <div class="col-12 col-lg-10">
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">Demo</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if selected_setting.subreddit_filters %}
+                {% for subreddit in selected_setting.subreddit_filters %}
+                <tr>
+                  <td><a href="https://reddit.com/r/{{ subreddit }}">r/{{ subreddit }}</a></td>
+                  <td><button type="submit" class="btn btn-secondary" name="remove_subreddit" value="{{ subreddit }}">Remove</button></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td>Add filters below.</td>
+                  <td>#</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Custom Text</h6>
+          </div>
+          <div class="col-12 col-lg-10">
+            <blockquote class="table-dark py-3">
+              <div class="container-fluid">
+              {% if selected_setting.custom_text %}
+                {{ selected_setting.custom_text }}
+              {% else %}
+                None. Set some custom text to be sent with notifications below.
+              {% endif %}
+              </div>
+            </blockquote>
+          </div>
+        </div>
+
+        <hr class="my-5">
+
+        <h4>Modify Settings</h4>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Add User</h6>
+            <p class="text-muted">These are the users who this channel will receive notifications for.</p>
+          </div>
+          <div class="col-12 col-lg-10">
+            <div class="row">
+              <div class="col-8"><input type="text" class="form-control" placeholder="Username" name="username"></div>
+              <div class="col-4"><button type="submit" class="btn btn-secondary" name="add_user">Add</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Add Keyword Filter</h6>
+            <p class="text-muted">These are words/phrases that are required in a stream's title for a notification to be sent.</p>
+          </div>
+          <div class="col-12 col-lg-10">
+            <div class="row">
+              <div class="col-8"><input type="text" class="form-control" placeholder="Keyword/Text Filter" name="keyword"></div>
+              <div class="col-4"><button type="submit" class="btn btn-secondary" name="add_keyword">Add</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Add Subreddit Filter</h6>
+            <p class="text-muted">A notification will only be sent if a stream is in one of these subreddits.</p>
+            <p class="text-muted">If you have no subreddit filters, then you will receive notifications for all RPAN subreddits.</p>
+          </div>
+          <div class="col-12 col-lg-10">
+            <div class="row">
+              <div class="col-8">
+                <select class="form-control" name="subreddit_filter">
+                  <option>Select Subreddit</option>
+                  {% for subreddit in subreddit_filters %}
+                    {% if selected_setting.subreddit_filters %}
+                      {% if subreddit not in selected_setting.subreddit_filters %}
+                      <option value="{{ subreddit }}">r/{{ subreddit }}</option>
+                      {% endif %}
+                    {% else %}
+                    <option value="{{ subreddit }}">r/{{ subreddit }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-4"><button type="submit" class="btn btn-secondary" name="add_subreddit">Add</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-2">
+            <h6>Set Custom Text</h6>
+            <p class="text-muted">This is text that will be sent with the stream notifications.</p>
+            <p class="text-muted">Leaving this blank and submitting will remove any custom text that is set.</p>
+          </div>
+          <div class="col-12 col-lg-10">
+            <div class="row">
+              <div class="col-8"><input type="text" class="form-control" placeholder="Custom Text" name="custom_text"></div>
+              <div class="col-4"><button type="submit" class="btn btn-secondary" name="set_custom_text">Set</button></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-5">
+
+        <h4 class="text-danger">Danger Zone</h4>
+
+        <button type="button" class="btn btn-outline-danger mt-3" data-toggle="modal" data-target="#delete_confirmation">Delete Setting</button>
+
+        <div class="modal fade" id="delete_confirmation" tabindex="-1" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light">
+              <div class="modal-header">
+                <h5 class="modal-title">Deleting Setting</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to delete then notification settings for:</p>
+                <p><span class="text-blue">#{{ selected_setting_channel.name }}</span> <span class="text-muted">({{ selected_setting.channel_id }})</span>?</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger" name="delete_setting">Confirm Deletion</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      {% endif %}
     </div>
   </div>
+  {% endif %}
+  {% endwith %}
 </div>
 {% endblock %}

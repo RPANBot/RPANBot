@@ -28,3 +28,10 @@ class ExcludedUserBlocked(CheckFailure):
     This exception is raised when an excluded user attempts to use a command.
     """
     pass
+
+
+class GlobalCooldownFailure(CheckFailure):
+    """
+    This exception is raised when a user is globally cooled down from using commands.
+    """
+    pass

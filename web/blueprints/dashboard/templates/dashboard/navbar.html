@@ -15,9 +15,9 @@
         <a class="nav-link dropdown-toggle" href="#" id="user-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.tag }}</a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown">
           <a class="dropdown-item" href="{{ url_for('dashboard.main') }}">Your Guilds</a>
-          {% if not user.refreshed_before %}<a class="dropdown-item" href="{{ url_for('dashboard.refresh') }}">Refresh your Guilds</a>{% endif %}
+          {% if not user.refreshed_before %}<a class="dropdown-item" href="{{ url_for('dashboard.refresh') }}" data-no-instant>Refresh your Guilds</a>{% endif %}
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="{{ url_for('home.logout') }}">Log Out</a>
+          <a class="dropdown-item" href="{{ url_for('home.logout') }}" data-no-instant>Log Out</a>
         </div>
       </li>
       {% else %}

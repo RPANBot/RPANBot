@@ -3,8 +3,8 @@
 config.yml
 
 # Development
+.idea
 .vscode
-development_files/
 
 # Shell Files
 *.sh

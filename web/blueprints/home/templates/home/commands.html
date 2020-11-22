@@ -62,19 +62,23 @@
 
         <p class="pt-3"><code>r!streamnotifs usernames</code> - View all users added to the currently selected stream notification channel.</p>
         <p><code>r!streamnotifs keywords</code> - View a list of keyword filters on the currently select stream notification channel.</p>
+        <p><code>r!streamnotifs subreddits</code> - View a list of subreddit filters on the currently select stream notification channel.</p>
 
         <p class="pt-3"><code>r!streamnotifs user add (keyword)</code> - Add a user to receive notifications for (on the currently selected channel).</p>
         <p><code>r!streamnotifs user remove (keyword)</code> - Remove a user from the stream notifications for the currently selected channel.</p>
 
         <p class="pt-3"><code>r!streamnotifs subreddit add (subreddit)</code> - Add a subreddit to the stream notifications requirement for this setting. Only streams broadcasted to these subreddits will be alerted.</p>
         <p><code>r!streamnotifs subreddit remove (subreddit)</code> - Remove a subreddit from the channel filter.</p>
+        <p><code>r!streamnotifs subreddit clear</code> - Clear all subreddit filters. (default back to notifications for all RPAN subreddits)</p>
 
         <p class="pt-3"><code>r!streamnotifs keyword add (keyword)</code> - Add a keyword filter for the current channel. <span class="text-muted">(This is a word or phrase that is required in the title for a notification to be sent.)</span></p>
         <p><code>r!streamnotifs keyword remove (keyword)</code> - Remove a keyword filter from the currently selected channel.</p>
+        <p><code>r!streamnotifs keyword clear</code> - Delete all added keyword filters.</p>
 
         <p class="pt-3"><code>r!streamnotifs settext (text)</code> - Set some text that is sent with the stream notifications. Mentions can be included in this.</p>
 
-        <p class="pt-3"><code>r!streamnotifs delete (channel/id)</code> - Delete a stream notification channel from the settings.</p>
+        <p class="pt-3"><code>r!streamnotifs delete <span class="text-muted">(*channel/id)</span></code> - Delete a stream notification channel from the settings (if no id is specified, then the currently selected setting is deleted).</p>
+        <p><code>r!streamnotifs deleteall</code> - Delete all of the stream notification settings for your guild. (Restricted to users with administrator permissions)</p>
       </div>
     </div>
   </div>
