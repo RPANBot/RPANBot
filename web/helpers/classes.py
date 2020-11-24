@@ -59,7 +59,9 @@ class User:
     def __init__(self, user_payload: dict, guilds_payload: dict) -> None:
         self.id = int(user_payload["id"])
         self.tag = "{username}#{discrim}".format(username=user_payload["username"], discrim=user_payload["discriminator"])
+
         self.is_real = True
+        self.is_developer = (self.id in current_app.core.settings.ids.bot_developers)
 
         self.refreshed_before = False
 
@@ -98,3 +100,4 @@ class User:
 class UnauthedUser:
     def __init__(self) -> None:
         self.is_real = False
+        self.is_developer = False

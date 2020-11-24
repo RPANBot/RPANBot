@@ -23,6 +23,7 @@ from web.helpers.user_handler import UserHandler
 
 from web.blueprints.home.views import home_bp
 from web.blueprints.dashboard.views import dashboard_bp
+from web.blueprints.developer.views import developer_bp
 
 
 def create_app(core) -> Quart:
@@ -54,5 +55,6 @@ def create_app(core) -> Quart:
 
     app.register_blueprint(home_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(developer_bp)
 
     return app

@@ -115,9 +115,10 @@ class NotificationsWatcher(Cog):
                     # Check if the user is in the broadcast notifications testing dataset.
                     # If they are then send a notification to all channels with 'rpanbot' added.
                     if db_session.query(BNTestingDataset).filter_by(username=author).first():
-                        result = [user.notifications_for.all for user in db_session.query(BNUser).filter_by(username="rpanbot").all()]
-                        for notif_setting in result:
-                            notifications_for.append(notif_setting)
+                        dataset_result = db_session.query(BNUser).filter_by(username="rpanbot").first()
+                        if dataset_result:
+                            for notif_setting in dataset_result.notifications_for.all():
+                                notifications_for.append(notif_setting)
 
                     # Continue if there aren't any settings for this user.
                     if not len(notifications_for):

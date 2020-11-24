@@ -141,3 +141,18 @@ def authed_only(function):
             return redirect(url_for("home.login"))
 
     return wrapper
+
+
+def developer_only(function):
+    @wraps(function)
+    async def wrapper(*args, **kwargs):
+        user = current_app.user_handler.get_user()
+        if user.is_real:
+            if user.is_developer:
+                return await function(*args, **kwargs)
+            else:
+                return "Error 401: Unauthorised", 401
+        else:
+            return redirect(url_for("home.login"))
+
+    return wrapper

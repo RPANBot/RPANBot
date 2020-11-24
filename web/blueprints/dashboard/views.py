@@ -467,7 +467,7 @@ async def guild_notifications_setting_submit(id: int, setting_id: int):
             setting.users.remove(user)
             current_app.db_session.commit()
 
-            await flash(u"Users > You will no longer receive notifications for that user in this channel.", "success")
+            await flash(f"Users > You will no longer receive notifications for u/{username} in this channel.", "success")
             return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
         # Setting custom text

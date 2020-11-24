@@ -1,0 +1,58 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="card bg-dark">
+    <div class="card-header">BN User Dataset</div>
+    <div class="card-body">
+      {% with alerts = get_flashed_messages(with_categories=true) %}
+      {% if alerts %}
+        {% for category, message in alerts %}
+        <div class="alert alert-{{ category }} alert-dismissible" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <form action="{{ url_for('developer.dataset_submit') }}" method="POST">
+        <div class="row">
+          <div class="col-12 col-lg-2"><h6>Username</h6></div>
+          <div class="col-12 col-lg-10">
+            <div class="row">
+              <div class="col-8"><input type="text" class="form-control" placeholder="Username" name="username"></div>
+              <div class="col-4"><button type="submit" class="btn btn-secondary" name="add_user">Add</button></div>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <table class="table table-hover table-dark">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Username</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if dataset %}
+            {% for user in dataset %}
+            <tr>
+              <td>{{ user.id }}</td>
+              <td><a href="https://reddit.com/user/{{ user.username }}">u/{{ user.username }}</a></td>
+              <td><button type="submit" class="btn btn-secondary" name="remove_user" value="{{ user.id }}">Remove</button></td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+              <td>#</td>
+              <td>None</td>
+              <td>#</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

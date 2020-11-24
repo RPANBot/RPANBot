@@ -71,9 +71,7 @@ class General(Cog):
             embed=RPANEmbed(
                 title="Pong!",
                 description=f"{round(self.bot.latency * 1000)}ms",
-
                 url="https://rpanbot.botcavern.xyz/",
-                thumbnail=self.bot.core.settings.links.bot_avatar,
 
                 user=ctx.author,
                 bot=self.bot,
