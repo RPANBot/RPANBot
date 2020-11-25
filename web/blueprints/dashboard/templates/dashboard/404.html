@@ -1,0 +1,12 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="card bg-dark">
+    <div class="card-header">Error 404 &middot; Page Not Found</div>
+    <div class="card-body">
+      <a class="btn btn-outline-orangered mr-2 mt-2" href="{{ url_for('home.main') }}">Return to Main Homepage</a>
+      <a class="btn btn-outline-orange mt-2" href="{{ url_for('dashboard.main') }}">Return to Dashboard Homepage</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

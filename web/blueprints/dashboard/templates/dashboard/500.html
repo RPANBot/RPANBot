@@ -1,0 +1,13 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="card bg-dark">
+    <div class="card-header">Error 500 &middot; Internal Server Error</div>
+    <div class="card-body">
+      <p>Something went wrong. But don't worry, the error has been reported!</p>
+
+      <a class="btn btn-outline-orangered" href="{{ url_for('dashboard.main') }}">Return to Dashboard Homepage</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

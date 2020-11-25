@@ -324,9 +324,10 @@ async def guild_notifications_setting_submit(id: int, setting_id: int):
                 await flash(u"Subreddit Filters > That is an invalid subreddit.", "danger")
                 return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
-            if subreddit in setting.subreddit_filters:
-                await flash(u"Subreddit Filters > That subreddit is already added.", "danger")
-                return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
+            if setting.subreddit_filters:
+                if subreddit in setting.subreddit_filters:
+                    await flash(u"Subreddit Filters > That subreddit is already added.", "danger")
+                    return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
             subreddit_filters = []
             if setting.subreddit_filters is not None:
@@ -345,11 +346,11 @@ async def guild_notifications_setting_submit(id: int, setting_id: int):
                 await flash(u"Keyword Filters > That is an invalid keyword.", "danger")
                 return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
-            if keyword in setting.keyword_filters:
-                await flash(u"Keyword Filters > That keyword is already added.", "danger")
-                return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
-
             if setting.keyword_filters:
+                if keyword in setting.keyword_filters:
+                    await flash(u"Keyword Filters > That keyword is already added.", "danger")
+                    return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
+
                 if len(setting.keyword_filters) >= 25:
                     await flash(u"Keyword Filters > This channel has hit the keyword filter limit of 25.", "danger")
                     return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
@@ -408,7 +409,7 @@ async def guild_notifications_setting_submit(id: int, setting_id: int):
                 await flash(u"Subreddit Filters > That is an invalid subreddit.", "warning")
                 return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
-            if subreddit not in setting.subreddit_filters:
+            if not setting.subreddit_filters or subreddit not in setting.subreddit_filters:
                 await flash(u"Subreddit Filters > That is not an added subreddit filter.", "danger")
                 return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
@@ -428,6 +429,10 @@ async def guild_notifications_setting_submit(id: int, setting_id: int):
                 return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
             else:
                 keyword_index = int(keyword_index)
+
+            if not setting.keyword_filters:
+                await flash(u"Keyword Filters > There are no keyword filters on this guild.", "danger")
+                return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
 
             if keyword_index not in range(0, len(setting.keyword_filters) - 1):
                 await flash(u"Keyword Filters > That is not an added keyword filter.", "danger")
@@ -509,3 +514,13 @@ async def guild_notifications_setting_submit(id: int, setting_id: int):
         return redirect(url_for("dashboard.guild_notifications", id=id) + f"?setting={setting_id}")
     else:
         return "Guild Not Found", 404
+
+
+@dashboard_bp.app_errorhandler(404)
+async def handle_404(err):
+    return await render_template("dashboard/404.html"), 404
+
+
+@dashboard_bp.app_errorhandler(500)
+async def handle_500(err):
+    return await render_template("dashboard/500.html"), 500
