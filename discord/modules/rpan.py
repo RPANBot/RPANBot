@@ -256,6 +256,7 @@ class RPAN(Cog):
         report_tables = {
             "promoting hate based on identity or vulnerability": "https://www.reddit.com/report?reason=its-promoting-hate-based-on-identity-or-vulnerability",
             "spam": "https://www.reddit.com/report?reason=this-is-spam",
+            "misinformation": "https://www.reddit.com/report?reason=this-is-misinformation",
             "targeted harassment": "https://www.reddit.com/report?reason=its-targeted-harassment",
             "violence or physical harm": "https://www.reddit.com/report?reason=it-threatens-violence-or-physical-harm",
             "rude, vulgar, or offensive": "https://www.reddit.com/report?reason=its-rude-vulgar-or-offensive",
