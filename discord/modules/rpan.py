@@ -48,6 +48,31 @@ class RPAN(Cog):
             ),
         )
 
+    @command(aliases=["howtostream"])
+    @bot_has_permissions(embed_links=True)
+    async def howtobroadcast(self, ctx) -> None:
+        """
+        Get information on how to broadcast to RPAN.
+        """
+        await ctx.send(
+            "",
+            embed=RPANEmbed(
+                title="Click here to view the section on the RPAN wiki.",
+                url="https://www.reddit.com/r/pan/wiki/index#wiki_how_do_i_broadcast_on_mobile.3F",
+                description=dedent("""
+                    There are two ways to broadcast to RPAN: from mobile and from desktop.
+
+                    You can easily broadcast from mobile using the [Reddit app.](https://www.reddit.com/r/pan/wiki/index#wiki_how_do_i_broadcast_on_mobile.3F)
+
+                    To broadcast from desktop, you can use [RPAN Studio.](https://www.reddit.com/r/RPANStudio/comments/hjimlq/you_want_a_desktop_streaming_solution_you_got_it/)
+                """).strip(),
+
+                user=ctx.author,
+                bot=self.bot,
+                message=ctx.message
+            ),
+        )
+
     @command(aliases=["ts", "topbroadcast", "tb"])
     @bot_has_permissions(embed_links=True)
     async def topstream(self, ctx, subreddit: Optional[str] = None) -> None:

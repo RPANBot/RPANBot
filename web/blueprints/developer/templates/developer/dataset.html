@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container-fluid mt-2">
   <div class="card bg-dark">
-    <div class="card-header">BN User Dataset</div>
+    <div class="card-header">BN User Dataset ({{ dataset | length }})</div>
     <div class="card-body">
       {% with alerts = get_flashed_messages(with_categories=true) %}
       {% if alerts %}

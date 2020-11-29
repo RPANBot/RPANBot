@@ -18,8 +18,10 @@ from quart import Blueprint, current_app, flash, render_template, redirect, requ
 from web.helpers.user_handler import developer_only
 
 from utils.validators import is_valid_reddit_username
-from utils.database.models.testing import BNTestingDataset
 
+from utils.database.models.testing import BNTestingDataset
+from utils.database.models.custom_prefixes import CustomPrefixes
+from utils.database.models.broadcast_notifications import BNUser, BNSetting
 
 developer_bp = Blueprint("developer", __name__, url_prefix="/dashboard/developer", template_folder="templates")
 
@@ -27,6 +29,17 @@ developer_bp = Blueprint("developer", __name__, url_prefix="/dashboard/developer
 @developer_only
 async def main():
     return await render_template("developer/main.html")
+
+
+@developer_bp.route("/stats/")
+@developer_only
+async def stats():
+    guild_count = len(current_app.core.bot.guilds)
+    user_count = current_app.core.bot.user_count
+    sn_count = current_app.db_session.query(BNSetting).count()
+    sn_user_count = current_app.db_session.query(BNUser).count()
+    prefix_count = current_app.db_session.query(CustomPrefixes).count()
+    return await render_template("developer/stats.html", guild_count=guild_count, user_count=user_count, sn_count=sn_count, sn_user_count=sn_user_count, prefix_count=prefix_count)
 
 
 @developer_bp.route("/dataset/")

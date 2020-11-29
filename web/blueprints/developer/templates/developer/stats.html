@@ -1,0 +1,59 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="container-fluid mt-2">
+  <div class="card bg-dark">
+    <div class="card-header">RPANBot Statistics</div>
+    <div class="card-body">
+      <a class="btn btn-orangered" href="{{ url_for('dashboard.main') }}">Main Dashboard</a>
+      <a class="btn btn-orange text-white" href="{{ url_for('developer.dataset') }}">BN Dataset</a>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-sm-3">
+      <div class="card bg-dark mb-4 border border-orangered">
+        <div class="card-header">Joined Guilds</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ guild_count }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-3">
+      <div class="card bg-dark mb-4 border border-orange">
+        <div class="card-header">Total Users</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ user_count }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-3">
+      <div class="card bg-dark mb-4 border border-mango">
+        <div class="card-header">Stream Notification Settings</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ sn_count }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-3">
+      <div class="card bg-dark mb-4 border border-yellow">
+        <div class="card-header">Stream Notification Users</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ sn_user_count }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-3">
+      <div class="card bg-dark mb-4 border border-teal">
+        <div class="card-header">Custom Prefix Settings</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ prefix_count }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
