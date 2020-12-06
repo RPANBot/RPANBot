@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from glob import glob
-from pathlib import Path
 
 from pygount import ProjectSummary, SourceAnalysis
 
@@ -32,7 +31,7 @@ from web.quart import create_app
 class RPANBotCore:
     def __init__(self) -> None:
         # Load the settings.
-        self.settings = Settings(file_path=Path(__file__).parent.absolute())
+        self.settings = Settings()
         self.rpan_subreddits = RPANSubreddits()
 
         # Calculate the lines of code.

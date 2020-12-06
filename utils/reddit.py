@@ -20,7 +20,7 @@ class RPANBotReddit(praw.Reddit):
     def __init__(self, core) -> None:
         self.core = core
 
-        self.user_agent = "RPANBot v2.1 (by u/OneUpPotato, u/JayRy27 and u/bsoyka - GitHub: RPANBot/RPANBot)"
+        self.user_agent = "RPANBot v2.2 (by u/OneUpPotato, u/JayRy27 and u/bsoyka - GitHub: RPANBot/RPANBot)"
         super().__init__(
             **self.core.settings.reddit.auth_info,
             user_agent=self.user_agent,

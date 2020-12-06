@@ -17,6 +17,8 @@ from discord import Colour, Embed, Message
 
 from typing import Union
 
+from utils.settings import Settings
+
 
 class RPANEmbed(Embed):
     def __init__(
@@ -85,9 +87,9 @@ class RPANEmbed(Embed):
 
         if footer_text:
             if message:
-                self.set_footer(text=f"{footer_text} ● rpanbot.botcavern.xyz")
+                self.set_footer(text=f"{footer_text} ● {Settings().links.site}")
             else:
                 self.set_footer(text=footer_text)
         else:
             if message:
-                self.set_footer(text="rpanbot.botcavern.xyz")
+                self.set_footer(text=f"{Settings().links.site}")

@@ -42,7 +42,7 @@ class RPANBot(Bot):
 
             activity=Activity(
                 type=ActivityType.watching,
-                name="RPAN | rpanbot.botcavern.xyz",
+                name=f"RPAN | {self.core.settings.links.site}",
             ),
         )
 

@@ -51,7 +51,7 @@ class General(Cog):
                     "Lines of Code": self.bot.core.lines_of_code,
                 },
 
-                url="https://rpanbot.botcavern.xyz/",
+                url=self.bot.core.settings.links.site_base,
                 thumbnail=self.bot.core.settings.links.bot_avatar,
 
                 user=ctx.author,
@@ -71,7 +71,7 @@ class General(Cog):
             embed=RPANEmbed(
                 title="Pong!",
                 description=f"{round(self.bot.latency * 1000)}ms",
-                url="https://rpanbot.botcavern.xyz/",
+                url=self.bot.core.settings.links.site_base,
 
                 user=ctx.author,
                 bot=self.bot,
@@ -142,7 +142,7 @@ class General(Cog):
             "",
             embed=RPANEmbed(
                 title="Click here to view the RPANBot web dashboard.",
-                url="https://rpanbot.botcavern.xyz",
+                url=self.bot.core.settings.links.site_base,
 
                 user=ctx.author,
                 bot=self.bot,
@@ -178,7 +178,7 @@ class General(Cog):
             "",
             embed=RPANEmbed(
                 title="Click here to view RPANBot's privacy policy.",
-                url="https://rpanbot.botcavern.xyz/privacy",
+                url=self.bot.core.settings.links.site_base + "/privacy",
 
                 user=ctx.author,
                 bot=self.bot,

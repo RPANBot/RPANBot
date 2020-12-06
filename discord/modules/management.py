@@ -98,7 +98,7 @@ class Management(Cog):
                 "",
                 embed=RPANEmbed(
                     title="Stream Notifications",
-                    url="https://rpanbot.botcavern.xyz/commands",
+                    url=self.bot.core.settings.links.site_base + "/commands",
                     description=dedent("""
                         **Configure notifications for when certain users go live on RPAN.**
                         Either you didn't enter a subcommand or that is an invalid subcommand.

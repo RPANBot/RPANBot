@@ -19,6 +19,7 @@ from discord.ext.commands import Cog, DefaultHelpCommand, HelpCommand
 from textwrap import dedent
 from itertools import groupby
 
+from utils.settings import Settings
 from discord.helpers.generators import RPANEmbed
 
 
@@ -32,14 +33,14 @@ class RPANBotHelpCommand(HelpCommand):
             description=dedent(f"""
                 **Info**
                 Type ``{self.clean_prefix}help (command name)`` for more info on a command.
-                [Click here to view a more in-depth description of the commands.](https://rpanbot.botcavern.xyz/commands)
+                [Click here to view a more in-depth description of the commands.]({Settings().links.site_base}/commands)
 
                 **Argument Key**
                 [argument] | optional argument
                 <argument> | required argument
             """.strip()),
 
-            url="https://rpanbot.botcavern.xyz/commands",
+            url=Settings().links.site_base + "/commands",
 
             user=self.context.author,
             bot=self.context.bot,
@@ -92,7 +93,7 @@ class RPANBotHelpCommand(HelpCommand):
             title="RPANBot Help · " + cog.qualified_name,
             description="Something went wrong.",
 
-            url="https://rpanbot.botcavern.xyz/commands",
+            url=Settings().links.site_base + "/commands",
 
             user=self.context.author,
             bot=self.context.bot,
@@ -104,7 +105,7 @@ class RPANBotHelpCommand(HelpCommand):
             description = dedent(f"""
                 **Info**
                 Type ``{self.clean_prefix}help (command name)`` for more info on a command.
-                [Click here to view a more in-depth description of the commands.](https://rpanbot.botcavern.xyz/commands)
+                [Click here to view a more in-depth description of the commands.]({Settings().links.site_base}/commands)
 
                 **Argument Key**
                 [argument] | optional argument
@@ -141,7 +142,7 @@ class RPANBotHelpCommand(HelpCommand):
             title="RPANBot Subcommands Help · " + group.qualified_name,
             description="Something went wrong.",
 
-            url="https://rpanbot.botcavern.xyz/commands",
+            url=Settings().links.site_base + "/commands",
 
             user=self.context.author,
             bot=self.context.bot,
@@ -156,7 +157,7 @@ class RPANBotHelpCommand(HelpCommand):
                 **Info**
                 Type ``{self.clean_prefix}{group.name} (command)`` to use a command listed here.
                 Use ``{self.clean_prefix}help {group.name} (command)`` to get more info on commands here.
-                [Click here to view a more in-depth description of the commands.](https://rpanbot.botcavern.xyz/commands)
+                [Click here to view a more in-depth description of the commands.]({Settings().links.site_base}/commands)
 
                 **Argument Key**
                 [argument] | optional argument
@@ -193,7 +194,7 @@ class RPANBotHelpCommand(HelpCommand):
             title="RPANBot Command Help",
             description="Something went wrong.",
 
-            url="https://rpanbot.botcavern.xyz/commands",
+            url=Settings().links.site_base + "/commands",
 
             user=self.context.author,
             bot=self.context.bot,

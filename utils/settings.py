@@ -15,8 +15,8 @@ limitations under the License.
 """
 from os import getenv
 
+from pathlib import Path
 from yaml import safe_load
-
 from dotenv import load_dotenv
 
 
@@ -168,6 +168,9 @@ class RPANBotSettings:
         def __init__(self, parent) -> None:
             self.parent = parent
 
+            self.site = "rpanbot.xyz"
+            self.site_base = "https://" + self.site
+
             self.bot_avatar = "https://i.imgur.com/Ayj5squ.png"
             self.support_guild = "https://discord.gg/DfBp4x4"
 
@@ -198,8 +201,8 @@ class RPANBotSettings:
 
 
 loaded_instance = None
-def Settings(*args, **kwargs) -> RPANBotSettings:
+def Settings() -> RPANBotSettings:
     global loaded_instance
     if not loaded_instance:
-        loaded_instance = RPANBotSettings(*args, **kwargs)
+        loaded_instance = RPANBotSettings(Path(__file__).parent.parent.absolute())
     return loaded_instance
