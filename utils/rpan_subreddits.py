@@ -15,6 +15,9 @@ limitations under the License.
 """
 from typing import Union
 
+from utils.settings import Settings
+from utils.strapi_wrapper import StrapiInstance
+
 
 class RPANSubreddits:
     def __init__(self) -> None:
@@ -54,6 +57,29 @@ class RPANSubreddits:
             "tys": "theyoushow",
             "witw": "whereintheworld"
         }
+
+        self.load_subreddits()
+
+    def load_subreddits(self) -> None:
+        """
+        Loads other RPAN subreddits from the config and API.
+        """
+        # Config Subreddits and Abbreviations
+        if Settings().reddit.rpan_subreddits is not None:
+            for subreddit in Settings().reddit.rpan_subreddits:
+                subreddit = subreddit.lower()
+                if subreddit not in self.list:
+                    self.list.append(subreddit)
+
+        if Settings().reddit.rpan_sub_abbreviations is not None:
+            for abbrv, subreddit in Settings().reddit.rpan_sub_abbreviations.items():
+                self.abbreviations[abbrv.lower()] = subreddit.lower()
+
+        # Strapi
+        for subreddit in StrapiInstance().fetch_viewer_subreddits():
+            subreddit = subreddit.lower()
+            if subreddit not in self.list:
+                self.list.append(subreddit)
 
     def ref_to_full(self, reference: str) -> Union[str, None]:
         """

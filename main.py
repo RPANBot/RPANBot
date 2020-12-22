@@ -32,10 +32,13 @@ class RPANBotCore:
     def __init__(self) -> None:
         # Load the settings.
         self.settings = Settings()
-        self.rpan_subreddits = RPANSubreddits()
 
-        # Calculate the lines of code.
-        self.calculate_loc()
+        # Initiate PRAW and the custom strapi wrapper.
+        self.reddit = RedditInstance(core=self)
+        self.strapi = StrapiInstance(core=self)
+
+        # Load the RPAN subreddit list module.
+        self.rpan_subreddits = RPANSubreddits()
 
         # Load the Sentry error tracking module.
         self.sentry = None
@@ -45,13 +48,12 @@ class RPANBotCore:
         # Load the database handler.
         self.db_handler = DatabaseHandler(settings=self.settings)
 
-        # Initiate PRAW and the custom strapi wrapper.
-        self.reddit = RedditInstance(core=self)
-        self.strapi = StrapiInstance(core=self)
-
         # Initiate the web and bot instances.
         self.web = create_app(core=self)
         self.bot = RPANBot(core=self)
+
+        # Calculate the lines of code.
+        self.calculate_loc()
 
         # Start the bot.
         self.bot.start_bot()

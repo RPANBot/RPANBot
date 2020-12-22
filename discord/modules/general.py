@@ -27,7 +27,6 @@ class General(Cog):
         self.core_developers = [
             "[u/OneUpPotato](https://reddit.com/u/OneUpPotato)",
             "[u/JayRy27](https://reddit.com/u/JayRy27)",
-            "[u/bsoyka](https://reddit.com/u/bsoyka)",
         ]
 
     @command(aliases=["information", "stats", "statistics"])
@@ -86,6 +85,7 @@ class General(Cog):
         View the list of people who have contributed to the bot.
         """
         other_contributors = [
+            "Bot Developer: [u/bsoyka](https://reddit.com/u/bsoyka)",
             "Snoo Avatar: [u/doradiamond](https://reddit.com/u/doradiamond)",
         ]
 

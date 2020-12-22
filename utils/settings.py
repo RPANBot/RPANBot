@@ -118,11 +118,11 @@ class RPANBotSettings:
 
         @property
         def rpan_subreddits(self) -> list:
-            return self.parent.config["rpan_subreddits"]["list"]
+            return self.parent.config["other_rpan_subreddits"]["list"]
 
         @property
         def rpan_sub_abbreviations(self) -> dict:
-            return self.parent.config["rpan_subreddits"]["abbreviations"]
+            return self.parent.config["other_rpan_subreddits"]["abbreviations"]
 
     class IDs:
         def __init__(self, parent) -> None:

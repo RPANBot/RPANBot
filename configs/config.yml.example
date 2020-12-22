@@ -36,8 +36,12 @@ channels:
 rpan_guilds:
     - 725895559973699645  # RPANBot Support Guild
 
-# Main Bot Developers (given access to developer commands)
+# Core Bot Developers (given access to developer commands)
 bot_developer_ids:
     - 564751291100823552  # OneUpPotato
     - 554807126174990349  # JayRy27
-    - 466677474672246800  # bsoyka
+
+# RPAN Subreddits
+other_rpan_subreddits:
+    list:
+    abbreviations:

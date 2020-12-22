@@ -53,6 +53,16 @@ class StrapiWrapper:
             headers=self.get_headers(),
         )
 
+    def fetch_viewer_subreddits(self) -> list:
+        """
+        Fetch a list of the recommended viewer subreddits.
+        :return: The list of viewer subreddits.
+        """
+        request = self.handle_request("recommended_viewer_subreddits")
+        if request.json()["status"] == "success":
+            return request.json()["data"]
+        return []
+
     def fetch_broadcast(self, id: str) -> Union[Broadcast, None]:
         """
         Fetch a broadcast by id.
