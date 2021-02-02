@@ -5,12 +5,12 @@
 </div>
 
 ## Learn More
-View the [bot's website](https://rpanbot.botcavern.xyz/) for more info.
+View the [bot's website](https://rpanbot.xyz/) for more info.
 
-Configure the bot for your guild using the [bot's web dashboard.](https://rpanbot.botcavern.xyz/dashboard)
+Configure the bot for your guild using the [bot's web dashboard.](https://rpanbot.xyz/dashboard)
 
 ## Invitation
-[Invite the Bot](https://discord.com/api/oauth2/authorize?client_id=710945234892095559&permissions=224256&scope=bot)
+[Invite the Bot](https://discord.com/oauth2/authorize?client_id=710945234892095559&scope=bot&permissions=536955968)
 
 [Join the Support Guild](https://discord.gg/DfBp4x4)
 
